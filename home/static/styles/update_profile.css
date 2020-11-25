@@ -1,0 +1,40 @@
+.input {
+    width: 100%;
+    height: 40px;
+    padding: 0px 15px;
+    border: none;
+    background-color: transparent;
+    -webkit-box-shadow: 0px 0px 0px 1px #DADADA inset, 0px 0px 0px 5px transparent;
+    box-shadow: 0px 0px 0px 1px #DADADA inset, 0px 0px 0px 5px transparent;
+    -webkit-transition: 0.3s all;
+    transition: 0.3s all;
+  }
+  
+.input:focus {
+-webkit-box-shadow: 0px 0px 0px 1px #F8694A inset, 0px 0px 0px 0px #F8694A;
+box-shadow: 0px 0px 0px 1px #F8694A inset, 0px 0px 0px 0px #F8694A;
+}
+
+textarea.input {
+padding: 15px;
+}
+
+.input-checkbox .caption {
+max-height: 0;
+overflow: hidden;
+-webkit-transition: 0.3s max-height;
+transition: 0.3s max-height;
+}
+
+.input-checkbox>label {
+color: #30323A;
+}
+
+.input-checkbox input[type="checkbox"]:checked+label+.caption, .input-checkbox input[type="radio"]:checked+label+.caption {
+max-height: 800px;
+}
+
+#id_city{
+    color: black;
+    margin-left: 0px;
+}

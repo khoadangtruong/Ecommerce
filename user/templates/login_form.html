@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% load i18n %}
+		{% load static %}
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>Login</title>
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" type="text/css" href="{% static '' %}styles/login.css">
+	</head>
+	<body>
+		<!-- section -->
+	<div class="section">
+		<!-- container -->
+		<div class="container">
+			<!-- row -->
+			<div class="row">
+                <div class="col-md-12">
+                    <div class="center">
+                        <div class="section-title">
+                            <h1 class="title">{% trans "Login" %}</h1>
+                        </div>
+                        <form action="" method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+								<input class="input" type="text" name="username" placeholder="Username">
+								<span></span>
+							</div>
+							<div class="form-group">
+								<input class="input" type="password" name="password" placeholder="Password">
+								<span></span>
+							</div>
+                            <input type="submit" value="Login">
+							{% if messages %}
+								{% for message in messages %}
+									<div class="alert alert-{{message.tags}}" role="alert" style="text-align: center; color: red;">
+										{{ message }}
+									</div>
+								{% endfor %}
+							{% endif %} 
+							<div class="signup_link">
+								Not a member? <a href="/register">Register</a>
+							</div>
+                        </form>
+                    </div>
+                </div>
+			</div>
+			<!-- /row -->
+			
+		</div>
+		<!-- /container -->
+	</div>
+	<!-- /section -->
+	</body>
+</html>
