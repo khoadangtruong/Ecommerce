@@ -15,6 +15,7 @@
 <link rel="stylesheet" type="text/css" href="{% static '' %}styles/product_styles.css">
 <link rel="stylesheet" type="text/css" href="{% static '' %}styles/product_responsive.css">
 <link rel="stylesheet" type="text/css" href="{% static '' %}styles/rating_form.css">
+<link rel="stylesheet" type="text/css" href="{% static '' %}styles/pages.css">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
 </head>
@@ -427,7 +428,7 @@
 	<div class="col-md-12">
 		<div class="product-tab">
 			<ul class="tab-nav">
-				<li><a data-toggle="tab" href="#tab2">Reviews (3)</a></li>
+				<li><a data-toggle="tab" href="#tab2">Reviews</a></li>
 			</ul>
 			<div class="tab-content">
 				<div class="row">
@@ -451,15 +452,45 @@
 										<p>{{ rs.comment }}.</p>
 									</div>
 								</div>
-
-								<ul class="reviews-pages">
-									<li class="active">1</li>
-									<li><a href="#">2</a></li>
-									<li><a href="#">3</a></li>
-									<li><a href="#"><i class="fa fa-caret-right"></i></a></li>
-								</ul>
 							</div>
 						{% endfor %}
+						<ul class="reviews-pages">
+							{% comment %} <li class="active">1</li>
+							<li><a href="#">2</a></li>
+							<li><a href="#">3</a></li>
+							<li><a href="#"><i class="fa fa-caret-right"></i></a></li> {% endcomment %}
+							{% comment %} {{ comments.has_previous }}
+							{{ comments.number }}
+							{{ comments.paginator.count }}
+							{{ comments.paginator.num_pages }}
+							{{ comments.paginator.page_range }}
+							{{ comments.has_next }} {% endcomment %}
+							{% if comments.has_previous %}
+								<a class="pagination-action" href="?page=1">
+									<i class="fa fa-angle-double-left"></i>
+								</a>
+								<a class="pagination-action" href="?page={{ comments.previous_page_number }}">
+									<i class="fa fa-angle-left"></i>
+								</a>
+							{% endif %}
+
+							{% for num in comments.paginator.page_range %}
+								{% if comments.number == num %}
+									<span class="pagination-number pagination-current">{{ num }}</span>
+								{% elif num > comments.number|add:'-3' and num < comments.number|add:'3' %}
+									<a class="pagination-number" href="?page={{ num }}">{{ num }}</a>
+								{% endif %}
+							{% endfor %}
+
+							{% if comments.has_next %}
+								<a class="pagination-action" href="?page={{ comments.next_page_number }}"> 
+									<i class="fa fa-angle-right"></i> 
+								</a>
+								<a class="pagination-action" href="?page={{ comments.paginator.page_number }}">
+									<i class="fa fa-angle-double-right"></i>
+								</a>
+							{% endif %}
+						</ul>
 					</div>
 					<div class="col-md-6">
 						<h4 class="text-uppercase">Write Your Review</h4>

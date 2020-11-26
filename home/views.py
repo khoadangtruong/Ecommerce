@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from datetime import datetime
 from django.contrib import messages
 from django.http.response import HttpResponse, HttpResponseRedirect
@@ -131,8 +132,13 @@ def category_products(request, id, slug):
 
 def shop(request):
     setting = Setting.objects.get(pk = 1)
-    all_products = Product.objects.all()
     category = Category.objects.all()
+
+    all_products = Product.objects.all()
+    paginator = Paginator(all_products, 10)
+    page = request.GET.get('page')
+    all_products = paginator.get_page(page)
+
     current_user = request.user
     shopcart = ShopCart.objects.filter(user_id = current_user.id)
     total = 0
@@ -191,7 +197,12 @@ def product_page(request, id, slug):
     category = Category.objects.all()
     product = Product.objects.get(pk = id)
     images = Images.objects.filter(product_id=id)
+
     comments = Comment.objects.filter(product_id=id, status='New')
+    paginator = Paginator(comments, 1)
+    page = request.GET.get('page')
+    comments = paginator.get_page(page)
+
     current_user = request.user
     shopcart = ShopCart.objects.filter(user_id = current_user.id)
     total = 0
@@ -199,11 +210,13 @@ def product_page(request, id, slug):
     for rs in shopcart:
         total += rs.product.price * rs.quantity
         count += rs.quantity
+
     product.num_visits = product.num_visits + 1
     product.last_visit = datetime.now()
     popular_products =  Product.objects.all().order_by('-num_visits')[0:6]
     recently_views_products = Product.objects.all().order_by('-last_visit')[0:6]
     product.save()
+
     context = {
         'product': product,
         'category': category,
@@ -214,5 +227,6 @@ def product_page(request, id, slug):
         'recently_views_products': recently_views_products,
         'popular_products': popular_products,
     }
+
     return render(request, 'product.html', context)
 

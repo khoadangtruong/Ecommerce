@@ -74,19 +74,32 @@
   margin-top: 10px;
 }
 
-.reviews-pages li {
-  display: inline-block;
-  margin-right: 6px;
-}
-
-.reviews-pages li a {
-  display: block;
-  min-width: 10px;
+.reviews-pages {
   text-align: center;
+  margin-top: 1em;
 }
 
-.reviews-pages li.active {
-  color: #F8694A;
+.pagination-action {
+  margin: 0 0.1em;
+  display: inline-block;
+  padding: 0.5em;
+  color: #B9B9B9;
+  font-size: 1.3em;
+} 
+
+.pagination-action:hover {
+  color: #3354AA;
+} 
+
+.pagination-number {
+  background-color: #6D85C7;
+  padding: 0.5em 0.8em;
+  color: #fff;
+  border-radius: 2px;
+}
+
+.pagination-number:hover, .pagination-current {
+  background-color: #3354AA;
 }
 
 /*-- review form --*/
