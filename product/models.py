@@ -1,3 +1,5 @@
+from django.forms import ModelForm
+from django.contrib.auth.models import User
 from django.db import models
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.utils.safestring import mark_safe
@@ -80,3 +82,27 @@ class Images(models.Model):
 
     def __str__(self):
         return self.title
+
+class Comment(models.Model):
+    STATUS = (
+        ('New', 'New'),
+        ('True', 'True'),
+        ('False', 'False'),
+    )
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    subject = models.CharField(max_length=255, blank=True)
+    comment = models.CharField(max_length=1024, blank=True)
+    rate = models.IntegerField(default=1)
+    ip = models.CharField(max_length=255, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS, default='New')
+    create_at = models.DateTimeField(auto_now_add=True)
+    update_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.status
+    
+class CommentForm(ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['subject', 'comment', 'rate']

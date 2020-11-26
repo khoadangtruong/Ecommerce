@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from home.models import Setting, ContactForm, ContactMessage
-from product.models import Product, Category, Images
+from product.models import Product, Category, Images, Comment
 from home.form import SearchForm
 from order.models import ShopCart
 
@@ -191,6 +191,7 @@ def product_page(request, id, slug):
     category = Category.objects.all()
     product = Product.objects.get(pk = id)
     images = Images.objects.filter(product_id=id)
+    comments = Comment.objects.filter(product_id=id, status='New')
     current_user = request.user
     shopcart = ShopCart.objects.filter(user_id = current_user.id)
     total = 0
@@ -207,6 +208,7 @@ def product_page(request, id, slug):
         'product': product,
         'category': category,
         'images': images,
+        'comments': comments,
         'total': total,
         'count': count,
         'recently_views_products': recently_views_products,
