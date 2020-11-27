@@ -15,6 +15,8 @@
 	<link rel="stylesheet" type="text/css" href="{% static '' %}plugins/jquery-ui-1.12.1.custom/jquery-ui.css">
 	<link rel="stylesheet" type="text/css" href="{% static '' %}styles/shop_styles.css">
 	<link rel="stylesheet" type="text/css" href="{% static '' %}styles/shop_responsive.css">
+	<link rel="stylesheet" type="text/css" href="{% static '' %}styles/pages.css">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
 </head>
 
@@ -415,7 +417,7 @@
 
 					<div class="shop_content">
 						<div class="shop_bar clearfix">
-							<div class="shop_product_count"><span>186</span> products found</div>
+							<div class="shop_product_count">Products found</div>
 							<div class="shop_sorting">
 								<span>Sort by:</span>
 								<ul>
@@ -450,17 +452,37 @@
 
 						<!-- Shop Page Navigation -->
 
-						<div class="shop_page_nav d-flex flex-row">
-							<div class="page_prev d-flex flex-column align-items-center justify-content-center"><i class="fas fa-chevron-left"></i></div>
-							<ul class="page_nav d-flex flex-row">
-								<li><a href="#">1</a></li>
-								<li><a href="#">2</a></li>
-								<li><a href="#">3</a></li>
-								<li><a href="#">...</a></li>
-								<li><a href="#">21</a></li>
+						{% comment %} <div class="shop_page_nav d-flex flex-row">
+							
+							<ul class="reviews-pages">
+								{% if products.has_previous %}
+									<a class="pagination-action" href="?page=1">
+										<i class="fa fa-angle-double-left"></i>
+									</a>
+									<a class="pagination-action" href="?page={{ products.previous_page_number }}">
+										<i class="fa fa-angle-left"></i>
+									</a>
+								{% endif %}
+
+								{% for num in products.paginator.page_range %}
+									{% if products.number == num %}
+										<span class="pagination-number pagination-current">{{ num }}</span>
+									{% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+										<a class="pagination-number" href="?page={{ num }}">{{ num }}</a>
+									{% endif %}
+								{% endfor %}
+
+								{% if products.has_next %}
+									<a class="pagination-action" href="?page={{ products.next_page_number }}"> 
+										<i class="fa fa-angle-right"></i> 
+									</a>
+									<a class="pagination-action" href="?page={{ products.paginator.num_pages }}">
+										<i class="fa fa-angle-double-right"></i>
+									</a>
+								{% endif %}
 							</ul>
-							<div class="page_next d-flex flex-column align-items-center justify-content-center"><i class="fas fa-chevron-right"></i></div>
-						</div>
+							
+						</div>  {% endcomment %}
 
 					</div>
 

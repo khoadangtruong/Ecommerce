@@ -1,3 +1,4 @@
+import random
 from django.core.paginator import Paginator
 from datetime import datetime
 from django.contrib import messages
@@ -109,6 +110,12 @@ def category_products(request, id, slug):
     products = Product.objects.filter(category_id = id)
     category = Category.objects.all()
     catdata = Category.objects.get(pk=id)
+
+    products = Product.objects.filter(category_id = id)
+    paginator = Paginator(products, 10)
+    page = request.GET.get('page')
+    products = paginator.get_page(page)
+
     current_user = request.user
     shopcart = ShopCart.objects.filter(user_id = current_user.id)
     total = 0
@@ -116,8 +123,10 @@ def category_products(request, id, slug):
     for rs in shopcart:
         total += rs.product.price * rs.quantity
         count += rs.quantity
+
     popular_products =  Product.objects.all().order_by('-num_visits')[0:6]
     recently_views_products = Product.objects.all().order_by('-last_visit')[0:6]
+
     context = {
         'catdata': catdata,
         'products': products,
@@ -167,10 +176,17 @@ def search(request):
             catid = form.cleaned_data['catid']
             if catid == 0:
                 products = Product.objects.filter(title__icontains=query)
+                paginator = Paginator(products, 10)
+                page = request.GET.get('page')
+                products = paginator.get_page(page)
             else:
                 products = Product.objects.filter(title__icontains=query, category_id=catid)
+                paginator = Paginator(products, 10)
+                page = request.GET.get('page')
+                products = paginator.get_page(page)
             
             category = Category.objects.all()
+
             current_user = request.user
             shopcart = ShopCart.objects.filter(user_id = current_user.id)
             total = 0
@@ -178,8 +194,10 @@ def search(request):
             for rs in shopcart:
                 total += rs.product.price * rs.quantity
                 count += rs.quantity
+
             popular_products =  Product.objects.all().order_by('-num_visits')[0:6]
             recently_views_products = Product.objects.all().order_by('-last_visit')[0:6]
+
             context = {
                 'products': products,
                 'query': query,
@@ -199,9 +217,13 @@ def product_page(request, id, slug):
     images = Images.objects.filter(product_id=id)
 
     comments = Comment.objects.filter(product_id=id, status='New')
-    paginator = Paginator(comments, 1)
+    paginator = Paginator(comments, 3)
     page = request.GET.get('page')
     comments = paginator.get_page(page)
+
+    related_products = list(product.category.products.filter(parent=None).exclude(id=product.id))
+    if len(related_products) >= 7:
+        related_products = random.sample(related_products, 7)
 
     current_user = request.user
     shopcart = ShopCart.objects.filter(user_id = current_user.id)
@@ -226,6 +248,7 @@ def product_page(request, id, slug):
         'count': count,
         'recently_views_products': recently_views_products,
         'popular_products': popular_products,
+        'related_products': related_products,
     }
 
     return render(request, 'product.html', context)

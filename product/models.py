@@ -48,7 +48,8 @@ class Product(models.Model):
         ('True', 'True'),
         ('False', 'False'),
     )
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
+    parent = models.ForeignKey('self', related_name='variants', on_delete=models.CASCADE, blank=True, null=True)
     title = models.CharField(max_length=512)
     keywords = models.CharField(max_length=512)
     description = models.CharField(max_length=1000)
