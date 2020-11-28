@@ -13,6 +13,7 @@ from order.models import ShopCart
 def index(request):
     setting = Setting.objects.get(pk = 1)
     category = Category.objects.all()
+
     products_top10 = Product.objects.all().order_by('?')[:10]
     Laptop = Product.objects.filter(category_id = 1).order_by('?')[:10]
     Smartphone = Product.objects.filter(category_id = 2).order_by('?')[:10]
@@ -22,7 +23,9 @@ def index(request):
     Tablet = Product.objects.filter(category_id = 9).order_by('?')[:8]
     Gears = Product.objects.filter(category_id = 10).order_by('?')[:10]
     Watch = Product.objects.filter(category_id = 11).order_by('?')[:10]
+
     page = 'home'
+
     current_user = request.user
     shopcart = ShopCart.objects.filter(user_id = current_user.id)
     total = 0
@@ -30,9 +33,13 @@ def index(request):
     for rs in shopcart:
         total += rs.product.price * rs.quantity
         count += rs.quantity
+
     popular_products =  Product.objects.all().order_by('num_visits')[:1]
     popular_products_down =  Product.objects.all().order_by('-num_visits')[:1]
     recently_views_products = Product.objects.all().order_by('-last_visit')[0:20]
+
+    comments = Comment.objects.all()
+
     context = {
         'setting': setting, 
         'page': page,
@@ -51,6 +58,7 @@ def index(request):
         'recently_views_products': recently_views_products,
         'popular_products_down': popular_products_down,
         'popular_products': popular_products,
+        'comments': comments,
     }
     return render(request, 'index.html', context)
 

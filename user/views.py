@@ -5,7 +5,7 @@ from user.models import UserProfile
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from product.models import Category
+from product.models import Category, Comment
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 
@@ -144,4 +144,28 @@ def user_password(request):
             'count': count
         }
         return render(request, 'user_password.html', context)
-            
+
+def user_comments(request):
+    category = Category.objects.all()
+    current_user = request.user
+    comments = Comment.objects.filter(user_id = current_user.id)
+    shopcart = ShopCart.objects.filter(user_id = current_user.id)
+    total = 0
+    count = 0
+    for rs in shopcart:
+        total += rs.product.price * rs.quantity
+        count += rs.quantity
+    context = {
+        'category': category,
+        'comments': comments,
+        'total': total,
+        'count': count
+    }
+    return render(request, 'user_comments.html', context)
+
+@login_required(login_url='/login')
+def user_deletecomment(request, id):
+    current_user = request.user
+    Comment.objects.filter(id=id, user_id = current_user.id).delete()
+    messages.success(request, 'Comment deleted')
+    return HttpResponseRedirect('/user/comments/')
