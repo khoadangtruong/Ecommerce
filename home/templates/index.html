@@ -225,14 +225,7 @@
 									<li class="hassubs">
 										<a href="#">Featured Brands<i class="fas fa-chevron-down"></i></a>
 										<ul>
-											<li>
-												<a href="#">Menu Item<i class="fas fa-chevron-down"></i></a>
-												<ul>
-													<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
-													<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
-													<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
-												</ul>
-											</li>
+											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
@@ -549,9 +542,9 @@
 						<div class="tabbed_container">
 							<div class="tabs">
 								<ul class="clearfix">
-									<li class="active">Tablet</li>
-									<li>Keyboard</li>
-									<li>Smartwatch</li>
+									<li class="active">Featured</li>
+									<li>On Sale</li>
+									<li>Best Rated</li>
 								</ul>
 								<div class="tabs_line"><span></span></div>
 							</div>
@@ -561,11 +554,11 @@
 								<div class="featured_slider slider">
 
 									<!-- Slider Item -->
-									{% for rs in Tablet%}
+									{% for rs in featured_products%}
 										<div class="featured_slider_item">
 											<div class="border_active"></div>
 											<div class="product_item discount d-flex flex-column align-items-center justify-content-center text-center">
-												<div class="product_image d-flex flex-column align-items-center justify-content-center"><img style="width: 80%;" src="{{rs.image.url}}" alt=""></div>
+												<div class="product_image d-flex flex-column align-items-center justify-content-center"><img style="width: 70%;" src="{{rs.image.url}}" alt=""></div>
 												<div class="product_content">
 													<div class="product_price discount">${{rs.price}}</span></div>
 													<div class="product_name"><div><a href="/product/{{ rs.id }}/{{ rs.slug }}">{{rs.title}}</a></div></div>
@@ -575,7 +568,7 @@
 															<input type="radio" name="product_color" style="background:#000000">
 															<input type="radio" name="product_color" style="background:#999999">
 														</div>
-														<a href="/order/addtoshopcart/{{rs.id}}" class="product_cart_button" style="padding: 5px 15px; border: 1px solid none; border-radius: 15px; text-decoration: none;">Add to Cart</a>
+														<a href="/order/addtoshopcart/{{rs.id}}" class="product_cart_button" style="color: white; padding: 5px 15px; border: 1px solid none; border-radius: 15px; text-decoration: none;">Add to Cart</a>
 													</div>
 												</div>
 												<div class="product_fav"><i class="fas fa-heart"></i></div>
@@ -595,11 +588,11 @@
 								<div class="featured_slider slider">
 
 									<!-- Slider Item -->
-									{% for rs in Gears%}
+									{% for rs in best_sellers%}
 										<div class="featured_slider_item">
 											<div class="border_active"></div>
 											<div class="product_item discount d-flex flex-column align-items-center justify-content-center text-center">
-												<div class="product_image d-flex flex-column align-items-center justify-content-center"><img style="width: 80%;" src="{{rs.image.url}}" alt=""></div>
+												<div class="product_image d-flex flex-column align-items-center justify-content-center"><img style="width: 70%;" src="{{rs.image.url}}" alt=""></div>
 												<div class="product_content">
 													<div class="product_price discount">${{rs.price}}</span></div>
 													<div class="product_name"><div><a href="/product/{{ rs.id }}/{{ rs.slug }}">{{rs.title}}</a></div></div>
@@ -609,11 +602,12 @@
 															<input type="radio" name="product_color" style="background:#000000">
 															<input type="radio" name="product_color" style="background:#999999">
 														</div>
-														<a href="/order/addtoshopcart/{{rs.id}}" class="product_cart_button" style="padding: 5px 15px; border: 1px solid none; border-radius: 15px; text-decoration: none;">Add to Cart</a>
+														<a href="/order/addtoshopcart/{{rs.id}}" class="product_cart_button" style="color: white; padding: 5px 15px; border: 1px solid none; border-radius: 15px; text-decoration: none;">Add to Cart</a>
 													</div>
 												</div>
 												<div class="product_fav"><i class="fas fa-heart"></i></div>
 												<ul class="product_marks">
+													<li class="product_mark product_discount">-25%</li>
 													<li class="product_mark product_new">new</li>
 												</ul>
 											</div>
@@ -633,7 +627,7 @@
 										<div class="featured_slider_item">
 											<div class="border_active"></div>
 											<div class="product_item discount d-flex flex-column align-items-center justify-content-center text-center">
-												<div class="product_image d-flex flex-column align-items-center justify-content-center"><img style="width: 80%;" src="{{rs.image.url}}" alt=""></div>
+												<div class="product_image d-flex flex-column align-items-center justify-content-center"><img style="width: 70%;" src="{{rs.image.url}}" alt=""></div>
 												<div class="product_content">
 													<div class="product_price discount">${{rs.price}}</span></div>
 													<div class="product_name"><div><a href="/product/{{ rs.id }}/{{ rs.slug }}">{{rs.title}}</a></div></div>
@@ -643,7 +637,7 @@
 															<input type="radio" name="product_color" style="background:#000000">
 															<input type="radio" name="product_color" style="background:#999999">
 														</div>
-														<a href="/order/addtoshopcart/{{rs.id}}" class="product_cart_button" style="padding: 5px 15px; border: 1px solid none; border-radius: 15px; text-decoration: none;">Add to Cart</a>
+														<a href="/order/addtoshopcart/{{rs.id}}" class="product_cart_button" style="color: white; padding: 5px 15px; border: 1px solid none; border-radius: 15px; text-decoration: none;">Add to Cart</a>
 													</div>
 												</div>
 												<div class="product_fav"><i class="fas fa-heart"></i></div>
@@ -878,7 +872,7 @@
 																<input type="radio" name="product_color" style="background:#000000">
 																<input type="radio" name="product_color" style="background:#999999">
 															</div>
-															<a href="/order/addtoshopcart/{{rs.id}}" class="product_cart_button" style="padding: 5px 15px; border: 1px solid none; border-radius: 15px; text-decoration: none;">Add to Cart</a>
+															<a href="/order/addtoshopcart/{{rs.id}}" class="product_cart_button" style="color: white; padding: 5px 15px; border: 1px solid none; border-radius: 15px; text-decoration: none;">Add to Cart</a>
 														</div>
 													</div>
 													<div class="product_fav"><i class="fas fa-heart"></i></div>
@@ -912,7 +906,7 @@
 																<input type="radio" name="product_color" style="background:#000000">
 																<input type="radio" name="product_color" style="background:#999999">
 															</div>
-															<a href="/order/addtoshopcart/{{rs.id}}" class="product_cart_button">Add to Cart</a>
+															<a href="/order/addtoshopcart/{{rs.id}}" class="product_cart_button" style="color: white; padding: 5px 15px; border: 1px solid none; border-radius: 15px; text-decoration: none;">Add to Cart</a>
 														</div>
 													</div>
 													<div class="product_fav"><i class="fas fa-heart"></i></div>

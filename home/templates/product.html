@@ -373,13 +373,14 @@
 					<div class="product_description">
 						<div class="product_category">{{ product.category }}</div>
 						<div class="product_name">{{ product.title }}</div>
-						<div class="rating_r rating_r_5 product_rating">
-							<i class="fa fa-star" style="font-weight: 900"></i>
-							<i class="fa fa-star" style="font-weight: 900"></i>
-							<i class="fa fa-star" style="font-weight: 900"></i>
-							<i class="fa fa-star" style="font-weight: 900"></i>
-							<i class="fa fa-star" style="font-weight: 900"></i>
-							<a class="add-comments-btn" href="#add-comments" style="margin-left: 80px; color: orange;">Add comment</a> 
+						<div class="product_rating" style="color: #fed330">
+							<i class="fa fa-star{% if product.averagereview < 1 %}-o empty{% endif %}"></i>
+							<i class="fa fa-star{% if product.averagereview < 2 %}-o empty{% endif %}"></i>
+							<i class="fa fa-star{% if product.averagereview < 3 %}-o empty{% endif %}"></i>
+							<i class="fa fa-star{% if product.averagereview < 4 %}-o empty{% endif %}"></i>
+							<i class="fa fa-star{% if product.averagereview < 5 %}-o empty{% endif %}"></i>
+						{{ product.averagereview |stringformat:".2f" }}
+							<a class="add-comments-btn" href="#add-comments" style="margin-left: 80px; color: #00a8ff;"> {{ product.countreview }} Review(s) / Add comment</a>
 						</div>
 						
 						<div class="product_text"><p>{{ product.detail | safe }}</p></div>

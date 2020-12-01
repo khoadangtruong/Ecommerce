@@ -1,3 +1,4 @@
+from django.db.models import Avg, Count
 from django.forms import ModelForm
 from django.contrib.auth.models import User
 from django.db import models
@@ -64,6 +65,8 @@ class Product(models.Model):
     update_at = models.DateTimeField(auto_now=True)
     num_visits = models.IntegerField(default=0)
     last_visit = models.DateTimeField(blank=True, null=True)
+    is_featured = models.BooleanField(default=False)
+    count_sold = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
@@ -71,10 +74,24 @@ class Product(models.Model):
     def image_tag(self):
         return mark_safe('<img src="{}" height="50"/>'.format(self.image.url))
     
+    image_tag.short_description = 'Image'
+
     def get_absolute_url(self):
         return reverse('category_detail', kwargs={"slug": self.slug})
     
-    image_tag.short_description = 'Image'
+    def averagereview(self):
+        reviews = Comment.objects.filter(product=self).aggregate(average=Avg('rate'))
+        avg = 0
+        if reviews['average'] is not None:
+            avg = float(reviews['average'])
+        return avg
+    
+    def countreview(self):
+        reviews = Comment.objects.filter(product=self).aggregate(count=Count('id'))
+        cnt = 0
+        if reviews['count'] is not None:
+            cnt = int(reviews['count'])
+        return cnt
 
 class Images(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)

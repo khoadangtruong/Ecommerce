@@ -23,6 +23,8 @@ def index(request):
     Tablet = Product.objects.filter(category_id = 9).order_by('?')[:8]
     Gears = Product.objects.filter(category_id = 10).order_by('?')[:10]
     Watch = Product.objects.filter(category_id = 11).order_by('?')[:10]
+    featured_products = Product.objects.filter(is_featured = True).order_by('?')[:6]
+    best_sellers = Product.objects.all().order_by('-count_sold')[:6]
 
     page = 'home'
 
@@ -53,6 +55,8 @@ def index(request):
         'Tablet': Tablet,
         'Gears': Gears,
         'Watch': Watch,
+        'featured_products': featured_products,
+        'best_sellers': best_sellers,
         'total': total,
         'count': count,
         'recently_views_products': recently_views_products,
@@ -152,7 +156,7 @@ def shop(request):
     category = Category.objects.all()
 
     all_products = Product.objects.all()
-    paginator = Paginator(all_products, 10)
+    paginator = Paginator(all_products, 15)
     page = request.GET.get('page')
     all_products = paginator.get_page(page)
 
@@ -242,6 +246,7 @@ def product_page(request, id, slug):
         count += rs.quantity
 
     product.num_visits = product.num_visits + 1
+    product.count_sold = product.count_sold + 1
     product.last_visit = datetime.now()
     popular_products =  Product.objects.all().order_by('-num_visits')[0:6]
     recently_views_products = Product.objects.all().order_by('-last_visit')[0:6]
