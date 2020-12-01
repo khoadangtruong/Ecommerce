@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-{% load static %}
-<title>Order Completed</title>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="description" content="OneTech shop project">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" type="text/css" href="{% static '' %}styles/bootstrap4/bootstrap.min.css">
-<link href="{% static '' %}plugins/fontawesome-free-5.0.1/css/fontawesome-all.css" rel="stylesheet" type="text/css">
-<link rel="stylesheet" type="text/css" href="{% static '' %}styles/cart_styles.css">
-<link rel="stylesheet" type="text/css" href="{% static '' %}styles/cart_responsive.css">
+	{% load static %}
+	<title>{{user.first_name}}'s profile</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="description" content="OneTech shop project">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="{% static '' %}styles/bootstrap4/bootstrap.min.css">
+	<link href="{% static '' %}plugins/fontawesome-free-5.0.1/css/fontawesome-all.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" type="text/css" href="{% static '' %}plugins/OwlCarousel2-2.2.1/owl.carousel.css">
+	<link rel="stylesheet" type="text/css" href="{% static '' %}plugins/OwlCarousel2-2.2.1/owl.theme.default.css">
+	<link rel="stylesheet" type="text/css" href="{% static '' %}plugins/OwlCarousel2-2.2.1/animate.css">
+	<link rel="stylesheet" type="text/css" href="{% static '' %}plugins/jquery-ui-1.12.1.custom/jquery-ui.css">
+	<link rel="stylesheet" type="text/css" href="{% static '' %}styles/shop_styles.css">
+	<link rel="stylesheet" type="text/css" href="{% static '' %}styles/shop_responsive.css">
 
 </head>
 
@@ -135,7 +139,7 @@
 								<div class="cart_container d-flex flex-row align-items-center justify-content-end">
 									<div class="cart_icon">
 										<img src="{% static '' %}images/cart.png" alt="">
-										<div class="cart_count"><span>{{count}}</span></div>
+										<div class="cart_count"><span>{{count}}</span></div> 
 									</div>
 									<div class="cart_content">
 										<div class="cart_text"><a href="/shopcart/">Cart</a></div>
@@ -143,6 +147,7 @@
 									</div>
 								</div>
 							</div>
+
 						</div>
 					</div>
 				</div>
@@ -168,7 +173,7 @@
 								{% load mptt_tags %}
 								<ul class="cat_menu">
 									{% recursetree category %}
-									<li><a href="/category/{{node.id}}/{{node.slug}}">{{node.title}} <i class="fas fa-chevron-right ml-auto"></i></a></li>
+										<li><a href="/category/{{node.id}}/{{node.slug}}">{{node.title}} <i class="fas fa-chevron-right ml-auto"></i></a></li>
 									{% comment %} <li><a href="#">Cameras & Photos<i class="fas fa-chevron-right"></i></a></li>
 									<li class="hassubs">
 										<a href="#">Hardware<i class="fas fa-chevron-right"></i></a>
@@ -202,22 +207,6 @@
 							<div class="main_nav_menu ml-auto">
 								<ul class="standard_dropdown main_nav_dropdown">
 									<li><a href="{% url 'home' %}">Home<i class="fas fa-chevron-down"></i></a></li>
-									{% comment %} <li class="hassubs">
-										<a href="#">Super Deals<i class="fas fa-chevron-down"></i></a>
-										<ul>
-											<li>
-												<a href="#">Menu Item<i class="fas fa-chevron-down"></i></a>
-												<ul>
-													<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
-													<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
-													<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
-												</ul>
-											</li>
-											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
-											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
-											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
-										</ul>
-									</li> {% endcomment %}
 									<li class="hassubs">
 										<a href="#">Featured Brands<i class="fas fa-chevron-down"></i></a>
 										<ul>
@@ -292,7 +281,7 @@
 									</ul>
 								</li>
 								<li class="page_menu_item">
-									<a href="index.html">Home<i class="fa fa-angle-down"></i></a>
+									<a href="#">Home<i class="fa fa-angle-down"></i></a>
 								</li>
 								<li class="page_menu_item has-children">
 									<a href="#">Super Deals<i class="fa fa-angle-down"></i></a>
@@ -345,24 +334,117 @@
 		</div>
 
 	</header>
+	
+	<!-- Home -->
 
-	<!-- Cart -->
+	<div class="home">
+		<div class="home_background parallax-window" data-parallax="scroll" data-image-src="{% static '' %}images/shop_background.jpg"></div>
+		<div class="home_overlay"></div>
+		<div class="home_content d-flex flex-column align-items-center justify-content-center">
+			<h2 class="home_title">Orders</h2>
+		</div>
+	</div>
 
-	<div class="cart_section">
+	<!-- User profile -->
+
+	<div class="shop">
 		<div class="container">
 			<div class="row">
-				<div class="col-lg-10 offset-lg-1">
-					<div class="cart_container">
-						<div class="cart_title">Order Completed</div>
-						<hr>
-                        <h2>Dear: {{user.first_name}} {{user.last_name}}</h2>
-                        <hr>
-                        <h3>Your order is completed</h3>
-                        <h3>Order code: {{ordercode}}</h3>
-                        <h3>Thank you</h3>
-                        <hr>
+				<div class="col-lg-3">
+					<div class="shop_sidebar">
+						<div class="sidebar_section">
+							<div class="sidebar_title">User panel</div>
+							<ul class="sidebar_categories">
+								<li><a href="/user">User profile</a></li>
+								<li><a href="/user/orders">My orders</a></li>
+								<li><a href="/user/favorites">My wishlist</a></li>
+								<li><a href="/user/comments">My comments</a></li>
+								<li><a href="/user/">Logout</a></li>
+							</ul>
+						</div>
 					</div>
+
 				</div>
+                
+				<div class="col-lg-9">
+                    
+                    <div class="section-title">
+                        <h4 class="title">Order detail</h4>
+                    </div>
+
+                    <table class="shopping-cart-table table" style="margin-bottom: 48px;">
+
+                        <tr>
+                            <th class="text-left">First name </th>
+                            <td class="text-left">{{ order.first_name }} </td>
+                        </tr>
+
+                        <tr>
+                            <th class="text-left">Phone </th>
+                            <td class="text-left">{{ order.phone }} </td>
+                        </tr>
+
+                        <tr>
+                            <th class="text-left">Address </th>
+                            <td class="text-left">{{ order.address }} </td>
+                        </tr>
+
+                        <tr>
+                            <th class="text-left">City </th>
+                            <td class="text-left">{{ order.city }} </td>
+                        </tr>
+
+                        <tr>
+                            <th class="text-left">Country </th>
+                            <td class="text-left">{{ order.country }} </td>
+                        </tr>
+
+                        <tr>
+                            <th class="text-left">Status </th>
+                            <td class="text-left">{{ order.status }} </td>
+                        </tr>
+
+                        <tr>
+                            <th class="text-left">Date </th>
+                            <td class="text-left">{{ order.created_at }} </td>
+                        </tr>
+
+                        <tr>
+                            <th class="text-left">Shipping inf </th>
+                            <td class="text-left">{{ order.adminnote }} </td>
+                        </tr>
+                    </table>
+
+                    <div class="section-title">
+                        <h4 class="title">Order items list</h4>
+                    </div>
+
+                    <table class="shopping-cart-table table">
+                        <tr>
+                            <th class="text-left">Product </th>
+                            <th class="text-left">Price </th>
+                            <th class="text-left">Quantity </th>
+                            <th class="text-left">Amount </th>
+                            <th class="text-left">Status </th>
+                            <th class="text-left">Date </th>
+                        </tr>
+                        {% for rs in orderitems %}
+                            <tr>
+                                <td class="text-left">
+                                    <a href="/product/{{ rs.product_id }}/{{ rs.product.slug }}">
+                                        <img src = "{{ rs.product.image.url }}" height = "80">
+                                    </a>
+                                </td>
+                                <td class="text-left">{{ rs.product.title }} </td>
+                                <td class="text-left">{{ rs.price }} </td>
+                                <td class="text-left">{{ rs.quantity }} </td>
+                                <td class="text-left">{{ rs.amount }}</td>
+                                <td class="text-left">{{ rs.status }} </td>
+                                <td class="text-left">{{ rs.created_at}} </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
 			</div>
 		</div>
 	</div>
@@ -504,8 +586,12 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 <script src="{% static '' %}plugins/scrollmagic/ScrollMagic.min.js"></script>
 <script src="{% static '' %}plugins/greensock/animation.gsap.min.js"></script>
 <script src="{% static '' %}plugins/greensock/ScrollToPlugin.min.js"></script>
+<script src="{% static '' %}plugins/OwlCarousel2-2.2.1/owl.carousel.js"></script>
 <script src="{% static '' %}plugins/easing/easing.js"></script>
-<script src="{% static '' %}js/cart_custom.js"></script>
+<script src="{% static '' %}plugins/Isotope/isotope.pkgd.min.js"></script>
+<script src="{% static '' %}plugins/jquery-ui-1.12.1.custom/jquery-ui.js"></script>
+<script src="{% static '' %}plugins/parallax-js-master/parallax.min.js"></script>
+<script src="{% static '' %}js/shop_custom.js"></script>
 </body>
 
 </html>

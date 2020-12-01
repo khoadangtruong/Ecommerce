@@ -108,14 +108,14 @@ def orderproduct(request):
             for rs in shopcart:
                 detail = OrderProduct()
                 detail.order_id = data.id
-                data.product_id = rs.product_id
-                data.user_id = current_user.id
-                data.quantity = rs.quantity
-                data.price = rs.price
-                data.amount = rs.amount
-                data.save()
+                detail.product_id = rs.product_id
+                detail.user_id = current_user.id
+                detail.quantity = rs.quantity
+                detail.price = rs.product.price
+                detail.amount = rs.amount
+                detail.save()
 
-                product = Product.objects.get(id=data.product_id)
+                product = Product.objects.get(id=rs.product_id)
                 product.amount -= rs.quantity
                 product.save()
 

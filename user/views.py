@@ -1,4 +1,4 @@
-from order.models import ShopCart
+from order.models import ShopCart, Order, OrderProduct
 from django.contrib.auth.forms import PasswordChangeForm
 from user.form import RegisterForm, ProfileUpdateForm, UserUpdateForm
 from user.models import UserProfile
@@ -169,3 +169,43 @@ def user_deletecomment(request, id):
     Comment.objects.filter(id=id, user_id = current_user.id).delete()
     messages.success(request, 'Comment deleted')
     return HttpResponseRedirect('/user/comments/')
+
+@login_required(login_url='/login')
+def user_orders(request):
+    category = Category.objects.all()
+    current_user = request.user
+    orders = Order.objects.filter(user_id = current_user.id)
+    shopcart = ShopCart.objects.filter(user_id = current_user.id)
+    total = 0
+    count = 0
+    for rs in shopcart:
+        total += rs.product.price * rs.quantity
+        count += rs.quantity
+    context = {
+        'category': category,
+        'orders': orders,
+        'total': total,
+        'count': count
+    }
+    return render(request, 'user_orders.html', context)
+
+@login_required(login_url='/login')
+def user_orderdetail(request, id):
+    category = Category.objects.all()
+    current_user = request.user
+    order = Order.objects.get(user_id = current_user.id, id = id)
+    orderitems = OrderProduct.objects.filter(order_id = id)
+    shopcart = ShopCart.objects.filter(user_id = current_user.id)
+    total = 0
+    count = 0
+    for rs in shopcart:
+        total += rs.product.price * rs.quantity
+        count += rs.quantity
+    context = {
+        'category': category,
+        'order': order,
+        'orderitems': orderitems,
+        'total': total,
+        'count': count
+    }
+    return render(request, 'user_order_detail.html', context)
