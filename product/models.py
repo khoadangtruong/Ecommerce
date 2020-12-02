@@ -67,6 +67,7 @@ class Product(models.Model):
     last_visit = models.DateTimeField(blank=True, null=True)
     is_featured = models.BooleanField(default=False)
     count_sold = models.IntegerField(default=0)
+    on_sale = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

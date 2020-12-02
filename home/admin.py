@@ -1,5 +1,5 @@
 from django.contrib import admin
-from home.models import Setting, ContactMessage
+from home.models import Setting, ContactMessage, FAQ
 
 class SettingAdmin(admin.ModelAdmin):
     list_display = ['title', 'company', 'address', 'email']
@@ -9,5 +9,10 @@ class ContactMessageAdmin(admin.ModelAdmin):
     readonly_fields = ('name', 'subject', 'email', 'message', 'ip')
     list_filter = ['status']
 
+class FAQAdmin(admin.ModelAdmin):
+    list_display = ['question', 'answer', 'ordernumber', 'status']
+    list_filter = ['status']
+
 admin.site.register(ContactMessage, ContactMessageAdmin)
 admin.site.register(Setting, SettingAdmin)
+admin.site.register(FAQ, FAQAdmin)

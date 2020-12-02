@@ -4,7 +4,7 @@ from datetime import datetime
 from django.contrib import messages
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from home.models import Setting, ContactForm, ContactMessage
+from home.models import Setting, ContactForm, ContactMessage, FAQ
 from product.models import Product, Category, Images, Comment
 from home.form import SearchForm
 from order.models import ShopCart
@@ -15,6 +15,7 @@ def index(request):
     category = Category.objects.all()
 
     products_top10 = Product.objects.all().order_by('?')[:10]
+
     Laptop = Product.objects.filter(category_id = 1).order_by('?')[:10]
     Smartphone = Product.objects.filter(category_id = 2).order_by('?')[:10]
     Smartphone_single_new_arrived = Product.objects.filter(category_id = 2).order_by('?')[:1]
@@ -23,8 +24,14 @@ def index(request):
     Tablet = Product.objects.filter(category_id = 9).order_by('?')[:8]
     Gears = Product.objects.filter(category_id = 10).order_by('?')[:10]
     Watch = Product.objects.filter(category_id = 11).order_by('?')[:10]
-    featured_products = Product.objects.filter(is_featured = True).order_by('?')[:6]
-    best_sellers = Product.objects.all().order_by('-count_sold')[:6]
+
+    featured_products = Product.objects.filter(is_featured = True).order_by('?')[:10]
+
+    best_sellers = Product.objects.all().order_by('-count_sold')[:10]
+    audio_best_sellers = Product.objects.filter(category_id = 12).order_by('-count_sold')[:6]
+    laptop_best_sellers = Product.objects.filter(category_id = 1).order_by('count_sold')[:8]
+
+    product_on_sale = Product.objects.all().order_by('-on_sale')[:5]
 
     page = 'home'
 
@@ -38,6 +45,7 @@ def index(request):
 
     popular_products =  Product.objects.all().order_by('num_visits')[:1]
     popular_products_down =  Product.objects.all().order_by('-num_visits')[:1]
+
     recently_views_products = Product.objects.all().order_by('-last_visit')[0:20]
 
     comments = Comment.objects.all()
@@ -63,6 +71,9 @@ def index(request):
         'popular_products_down': popular_products_down,
         'popular_products': popular_products,
         'comments': comments,
+        'product_on_sale': product_on_sale,
+        'audio_best_sellers': audio_best_sellers,
+        'laptop_best_sellers': laptop_best_sellers,
     }
     return render(request, 'index.html', context)
 
@@ -168,7 +179,9 @@ def shop(request):
         total += rs.product.price * rs.quantity
         count += rs.quantity
     popular_products =  Product.objects.all().order_by('-num_visits')[0:6]
+    
     recently_views_products = Product.objects.all().order_by('-last_visit')[0:6]
+
     context = {
         'setting': setting,
         'all_products': all_products,
@@ -245,12 +258,19 @@ def product_page(request, id, slug):
         total += rs.product.price * rs.quantity
         count += rs.quantity
 
-    product.num_visits = product.num_visits + 1
+    
     product.count_sold = product.count_sold + 1
+
+    product.num_visits = product.num_visits + 1
+    
     product.last_visit = datetime.now()
     popular_products =  Product.objects.all().order_by('-num_visits')[0:6]
     recently_views_products = Product.objects.all().order_by('-last_visit')[0:6]
+
     product.save()
+
+    if product.on_sale is True:
+        product.price = product.price - (product.price * 0.25)
 
     context = {
         'product': product,
@@ -266,3 +286,25 @@ def product_page(request, id, slug):
 
     return render(request, 'product.html', context)
 
+def faq(request):
+    category = Category.objects.all()
+
+    faq = FAQ.objects.filter(status="True").order_by('ordernumber')
+    paginator = Paginator(faq, 3)
+    page = request.GET.get('page')
+    faq = paginator.get_page(page)
+
+    current_user = request.user
+    shopcart = ShopCart.objects.filter(user_id = current_user.id)
+    total = 0
+    count = 0
+    for rs in shopcart:
+        total += rs.product.price * rs.quantity
+        count += rs.quantity
+    context = {
+        'category': category,
+        'total': total,
+        'count': count,
+        'faq': faq,
+    }
+    return render(request, 'faq.html', context)

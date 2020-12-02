@@ -31,6 +31,7 @@ urlpatterns = [
     path('ckeditor/', include('ckeditor_uploader.urls')),
 
     path('about/',views.about, name='about'),
+    path('faq/',views.faq, name='faq'),
     path('contact/',views.contact, name='contact'),
     path('search/', views.search, name='search'),
     path('shop/', views.shop, name='shop'),
@@ -43,6 +44,7 @@ urlpatterns = [
     path('login/',UserViews.login_form, name='login_form'),
     path('logout/',UserViews.logout_func, name='logout_func'),
     path('register/',UserViews.register_form, name='register_form'),
+
 ]
 
 if settings.DEBUG:

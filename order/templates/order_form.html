@@ -11,7 +11,7 @@
 <link href="{% static '' %}plugins/fontawesome-free-5.0.1/css/fontawesome-all.css" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="{% static '' %}styles/cart_styles.css">
 <link rel="stylesheet" type="text/css" href="{% static '' %}styles/cart_responsive.css">
-
+<link rel="stylesheet" type="text/css" href="{% static '' %}styles/order_form.css">
 
 <link type="text/css" rel="stylesheet" href="{% static '' %}styles/slick.css" />
 <link type="text/css" rel="stylesheet" href="{% static '' %}styles/slick-theme.css" />
@@ -349,12 +349,76 @@
 				</div>
 			</div>
 		</div>
-
 	</header>
 
 	<!-- Cart -->
+	<div class="checkout-info" >
+		<div class="row">
+			<div class="col-lg-6" style="margin-top: 60px;">
+				<div class="box-element" id="form-wrapper">
+					<form id="form" method="post">
+						{% csrf_token %}
+						<div id="user-info">
+							<div class="form-field">
+								<input required class="form-control" type="text" value="{{ user.first_name }}" name="first_name" placeholder="First Name..">
+							</div>
+							<div class="form-field">
+								<input required class="form-control" type="text" value="{{ user.last_name }}" name="last_name" placeholder="Last Name..">
+							</div>
+						</div>
+						
+						<div id="shipping-info">
+							<hr>
+							<p>Shipping Information:</p>
+							<hr>
+							<div class="form-field">
+								<input class="form-control" type="text" value="{{ profile.address }}" name="address" placeholder="Address..">
+							</div>
+							<div class="form-field">
+								<input class="form-control" type="text" value="{{ profile.city }}" name="city" placeholder="City..">
+							</div>
+							<div class="form-field">
+								<input class="form-control" type="tel" value="{{ profile.phone }}" name="phone" placeholder="Phone..">
+							</div>
+							{% comment %} <div class="form-field">
+								<input class="form-control" type="text" value="{{ profile.address }}" name="zipcode" placeholder="Zip code..">
+							</div> {% endcomment %}
+						</div>
+						<hr>
+						<button id="form-button" class="btn btn-success btn-block" type="submit" value="Continue">Continue</button>
+					</form>
+				</div>
+				<br>
 
-	<div class="cart_section">
+				<div class="box-element hidden" id="payment-info">
+					<small>Paypal Options</small>
+				</div>
+
+			</div>
+
+			<div class="col-lg-6" style="margin-top: 60px;">
+				<div class="box-element">
+					{% comment %} <a class="btn btn-outline-dark" href="/shopcart/">Back to cart</a> {% endcomment %}
+					{% comment %} <hr> {% endcomment %}
+					<h3>Order Summary</h3>
+					<hr>
+					{% for rs in shopcart %}
+						<div class="cart-row">
+							<div style="flex:1.5"><img style="width: 80px;" class="row-image" src="{{ rs.product.image.url }}"></div>
+							<div style="flex:1.5"><p>{{ rs.product }}</p></div>
+							<div style="flex:1"><p>Silver</p></div>
+							<div style="flex:1"><p>${{ rs.product.price }}</p></div>
+							<div style="flex:1"><p>x{{ rs.quantity }}</p></div>
+						</div>
+					{% endfor %}
+					<h5>Items:   {{ count }}</h5>
+					<h5>Total:   ${{ total }}</h5>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{% comment %} <div class="cart_section">
 		<div class="container">
 			<div class="row">
                 <form action="" method="POST" >
@@ -362,7 +426,7 @@
                     <div class="col-md-6" style="float: left;">
 						<div class="billing-details">
 							<div class="section-title">
-								<h3 class="title">Shipping Details</h3>
+								<h3 class="title">Billing Details</h3>
 							</div>
 							<div class="form-group">
                                 <label for="id_first_name">First name:</label>
@@ -416,7 +480,7 @@
                                 <label for="id_first_name">Security Number:</label>
 								<input class="input" type="tel" name="senumber" value="" class="input" >
 							</div>
-						</div>
+						</div>  
 
 						<div class="payments-methods">
 							<div class="section-title">
@@ -447,8 +511,10 @@
 								</div>
 							</div>
 						</div>
-					</div>
-                
+						
+					</div> 
+
+					
 
 					<div class="col-lg-10 offset-lg-1">
 						<div class="cart_container">
@@ -479,7 +545,7 @@
 													<div class="cart_item_title">Total</div>
 													<div class="cart_item_text">${{rs.amount}}</div>
 												</div>
-												<a href="/order/deletefromcart/{{ rs.id }}" onclick="return confirm('Delete! Are you sure?')"style="color: red; padding: 7px; border: 1px solid red; text-align: center; border-radius: 25px; font-size: 14px; margin-top: 35px; margin-right: -20px;" >X</a>
+												<a href="/order/deletefromcart/{{ rs.id }}" onclick="return confirm('Delete! Are you sure?')"style="color: white; background-color:red; font-weight: bold; padding: 7px; border: 1px solid red; text-align: center; border-radius: 20px; font-size: 14px; margin-top: 35px; margin-bottom: 38px; margin-right: -20px;" >X</a>
 											</div>
 										</li>
 									</ul>
@@ -502,11 +568,11 @@
                 </form>
 			</div>
 		</div>
-	</div>
+	</div> {% endcomment %}
 
 	<!-- Newsletter -->
 
-	<div class="newsletter">
+	{% comment %} <div class="newsletter">
 		<div class="container">
 			<div class="row">
 				<div class="col">
@@ -527,11 +593,11 @@
 				</div>
 			</div>
 		</div>
-	</div>
+	</div> {% endcomment %}
 
 	<!-- Footer -->
 
-	<footer class="footer">
+	{% comment %} <footer class="footer">
 		<div class="container">
 			<div class="row">
 
@@ -604,11 +670,11 @@
 
 			</div>
 		</div>
-	</footer>
+	</footer> {% endcomment %}
 
 	<!-- Copyright -->
 
-	<div class="copyright">
+	{% comment %} <div class="copyright">
 		<div class="container">
 			<div class="row">
 				<div class="col">
@@ -617,15 +683,15 @@
 						<div class="copyright_content"><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
 Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
 <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-</div>
-						<div class="logos ml-sm-auto">
+</div> {% endcomment %}
+						{% comment %} <div class="logos ml-sm-auto">
 							<ul class="logos_list">
 								<li><a href="#"><img src="{% static '' %}images/logos_1.png" alt=""></a></li>
 								<li><a href="#"><img src="{% static '' %}images/logos_2.png" alt=""></a></li>
 								<li><a href="#"><img src="{% static '' %}images/logos_3.png" alt=""></a></li>
 								<li><a href="#"><img src="{% static '' %}images/logos_4.png" alt=""></a></li>
 							</ul>
-						</div>
+						</div> {% endcomment %}
 					</div>
 				</div>
 			</div>
