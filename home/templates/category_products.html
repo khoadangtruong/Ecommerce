@@ -158,6 +158,8 @@
 									</div>
 									<div class="cart_content">
 										<div class="cart_text"><a href="/shopcart/">Cart</a></div>
+										{% load myapptags %}
+										{% shopcarttotal user.id as total %}
 										<div class="cart_price">${{total}}</div>
 									</div>
 								</div>
@@ -184,6 +186,8 @@
 									<div class="cat_burger"><span></span><span></span><span></span></div>
 									<div class="cat_menu_text">categories</div>
 								</div>
+								{% load myapptags %}
+								{% categorylist as category %}
 								{% load mptt_tags %}
 								<ul class="cat_menu">
 									{% recursetree category %}
@@ -371,14 +375,16 @@
 					<div class="shop_sidebar">
 						<div class="sidebar_section">
 							<div class="sidebar_title">Categories</div>
-								{% load mptt_tags %}
-								<ul class="sidebar_categories">
-									{% recursetree category %}
-										<li><a href="/category/{{node.id}}/{{node.slug}}">{{node.title}}</a></li>
-									{% endrecursetree %}
-								</ul>
+							{% load myapptags %}
+							{% categorylist as category %}
+							{% load mptt_tags %}
+							<ul class="sidebar_categories">
+								{% recursetree category %}
+									<li><a href="/category/{{node.id}}/{{node.slug}}">{{node.title}}</a></li>
+								{% endrecursetree %}
+							</ul>
 						</div>
-						<div class="sidebar_section filter_by_section">
+						{% comment %} <div class="sidebar_section filter_by_section">
 							<div class="sidebar_title">Filter By</div>
 							<div class="sidebar_subtitle">Price</div>
 							<div class="filter_price">
@@ -398,7 +404,7 @@
 								<li class="color"><a href="#" style="background: #ffffff; border: solid 1px #e1e1e1;"></a></li>
 							</ul>
 						</div>
-						{% comment %} <div class="sidebar_section">
+						<div class="sidebar_section">
 							<div class="sidebar_subtitle brands_subtitle">Brands</div>
 							<ul class="brands_list">
 								<li class="brand"><a href="#">Apple</a></li>
@@ -409,7 +415,7 @@
 								<li class="brand"><a href="#">Asus</a></li>
 								<li class="brand"><a href="#">Xiaomi</a></li>
 							</ul>
-						</div> {% endcomment %}
+						</div>  {% endcomment %}
 					</div>
 
 				</div>
@@ -425,9 +431,8 @@
 								<span>Sort by:</span>
 								<ul>
 									<li>
-										<span class="sorting_text">highest rated<i class="fas fa-chevron-down"></span></i>
+										<span class="sorting_text">name<i class="fas fa-chevron-down"></span></i>
 										<ul>
-											<li class="shop_sorting_button" data-isotope-option='{ "sortBy": "original-order" }'>highest rated</li>
 											<li class="shop_sorting_button" data-isotope-option='{ "sortBy": "name" }'>name</li>
 											<li class="shop_sorting_button"data-isotope-option='{ "sortBy": "price" }'>price</li>
 										</ul>

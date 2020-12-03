@@ -158,6 +158,8 @@
 									</div>
 									<div class="cart_content">
 										<div class="cart_text"><a href="/shopcart/">Cart</a></div>
+										{% load myapptags %}
+										{% shopcarttotal user.id as total %}
 										<div class="cart_price">${{total}}</div>
 									</div>
 								</div>
@@ -185,6 +187,8 @@
 									<div class="cat_burger"><span></span><span></span><span></span></div>
 									<div class="cat_menu_text">categories</div>
 								</div>
+								{% load myapptags %}
+								{% categorylist as category %}
 								{% load mptt_tags %}
 								<ul class="cat_menu">
 									{% recursetree category %}

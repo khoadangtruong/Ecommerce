@@ -12,10 +12,7 @@ from order.models import ShopCart
 
 def index(request):
     setting = Setting.objects.get(pk = 1)
-    category = Category.objects.all()
-
     products_top10 = Product.objects.all().order_by('?')[:10]
-
     Laptop = Product.objects.filter(category_id = 1).order_by('?')[:10]
     Smartphone = Product.objects.filter(category_id = 2).order_by('?')[:10]
     Smartphone_single_new_arrived = Product.objects.filter(category_id = 2).order_by('?')[:1]
@@ -35,13 +32,6 @@ def index(request):
 
     page = 'home'
 
-    current_user = request.user
-    shopcart = ShopCart.objects.filter(user_id = current_user.id)
-    total = 0
-    
-    for rs in shopcart:
-        total += rs.product.price * rs.quantity
-
     popular_products =  Product.objects.all().order_by('num_visits')[:1]
     popular_products_down =  Product.objects.all().order_by('-num_visits')[:1]
 
@@ -52,7 +42,6 @@ def index(request):
     context = {
         'setting': setting, 
         'page': page,
-        'category': category,
         'products_top10': products_top10,
         'Laptop': Laptop,
         'Audio': Audio,
@@ -64,7 +53,6 @@ def index(request):
         'Watch': Watch,
         'featured_products': featured_products,
         'best_sellers': best_sellers,
-        'total': total,
         'recently_views_products': recently_views_products,
         'popular_products_down': popular_products_down,
         'popular_products': popular_products,
@@ -77,18 +65,8 @@ def index(request):
 
 def about(request):
     setting = Setting.objects.get(pk = 1)
-    category = Category.objects.all()
-    current_user = request.user
-    shopcart = ShopCart.objects.filter(user_id = current_user.id)
-    total = 0
-    
-    for rs in shopcart:
-        total += rs.product.price * rs.quantity
-        
     context = {
         'setting': setting,
-        'category': category,
-        'total': total,
     }
     return render(request, 'about.html', context)
 
@@ -107,27 +85,19 @@ def contact(request):
             return HttpResponseRedirect('/contact')
 
     setting = Setting.objects.get(pk = 1)
-    category = Category.objects.all()
-    form = ContactForm
-    current_user = request.user
-    shopcart = ShopCart.objects.filter(user_id = current_user.id)
-    total = 0
     
-    for rs in shopcart:
-        total += rs.product.price * rs.quantity
+    form = ContactForm
         
     context = {
         'setting': setting,
-        'category': category,
         'form': form,
-        'total': total,
         }
     return render(request, 'contact.html', context)
 
 def category_products(request, id, slug):
     setting = Setting.objects.get(pk = 1)
     products = Product.objects.filter(category_id = id)
-    category = Category.objects.all()
+    
     catdata = Category.objects.get(pk=id)
 
     products = Product.objects.filter(category_id = id)
@@ -135,23 +105,13 @@ def category_products(request, id, slug):
     page = request.GET.get('page')
     products = paginator.get_page(page)
 
-    current_user = request.user
-    shopcart = ShopCart.objects.filter(user_id = current_user.id)
-    total = 0
-    
-    for rs in shopcart:
-        total += rs.product.price * rs.quantity
-        
-
     popular_products =  Product.objects.all().order_by('-num_visits')[0:6]
     recently_views_products = Product.objects.all().order_by('-last_visit')[0:6]
 
     context = {
         'catdata': catdata,
         'products': products,
-        'category': category,
         'setting': setting,
-        'total': total,
         'recently_views_products': recently_views_products,
         'popular_products': popular_products,
     }
@@ -159,19 +119,12 @@ def category_products(request, id, slug):
 
 def shop(request):
     setting = Setting.objects.get(pk = 1)
-    category = Category.objects.all()
+    
 
-    all_products = Product.objects.all()
-    paginator = Paginator(all_products, 15)
+    all_products = Product.objects.all().order_by('?')
+    paginator = Paginator(all_products, 20)
     page = request.GET.get('page')
     all_products = paginator.get_page(page)
-
-    current_user = request.user
-    shopcart = ShopCart.objects.filter(user_id = current_user.id)
-    total = 0
-    
-    for rs in shopcart:
-        total += rs.product.price * rs.quantity
         
     popular_products =  Product.objects.all().order_by('-num_visits')[0:6]
     
@@ -180,8 +133,6 @@ def shop(request):
     context = {
         'setting': setting,
         'all_products': all_products,
-        'category': category,
-        'total': total,
         'recently_views_products': recently_views_products,
         'popular_products': popular_products,
     }
@@ -203,15 +154,6 @@ def search(request):
                 paginator = Paginator(products, 10)
                 page = request.GET.get('page')
                 products = paginator.get_page(page)
-            
-            category = Category.objects.all()
-
-            current_user = request.user
-            shopcart = ShopCart.objects.filter(user_id = current_user.id)
-            total = 0
-            
-            for rs in shopcart:
-                total += rs.product.price * rs.quantity
                 
 
             popular_products =  Product.objects.all().order_by('-num_visits')[0:6]
@@ -220,9 +162,6 @@ def search(request):
             context = {
                 'products': products,
                 'query': query,
-                'category': category,
-                'total': total,
-    
                 'recently_views_products': recently_views_products,
                 'popular_products': popular_products,
             }
@@ -231,7 +170,7 @@ def search(request):
     return HttpResponseRedirect('/')
 
 def product_page(request, id, slug):
-    category = Category.objects.all()
+    
     product = Product.objects.get(pk = id)
     images = Images.objects.filter(product_id=id)
 
@@ -243,15 +182,6 @@ def product_page(request, id, slug):
     related_products = list(product.category.products.filter(parent=None).exclude(id=product.id))
     if len(related_products) >= 7:
         related_products = random.sample(related_products, 7)
-
-    current_user = request.user
-    shopcart = ShopCart.objects.filter(user_id = current_user.id)
-    total = 0
-    
-    for rs in shopcart:
-        total += rs.product.price * rs.quantity
-        
-
     
     product.count_sold = product.count_sold + 1
 
@@ -268,10 +198,8 @@ def product_page(request, id, slug):
 
     context = {
         'product': product,
-        'category': category,
         'images': images,
         'comments': comments,
-        'total': total,
         'recently_views_products': recently_views_products,
         'popular_products': popular_products,
         'related_products': related_products,
@@ -280,23 +208,12 @@ def product_page(request, id, slug):
     return render(request, 'product.html', context)
 
 def faq(request):
-    category = Category.objects.all()
-
     faq = FAQ.objects.filter(status="True").order_by('ordernumber')
     paginator = Paginator(faq, 3)
     page = request.GET.get('page')
     faq = paginator.get_page(page)
-
-    current_user = request.user
-    shopcart = ShopCart.objects.filter(user_id = current_user.id)
-    total = 0
-    
-    for rs in shopcart:
-        total += rs.product.price * rs.quantity
         
     context = {
-        'category': category,
-        'total': total,
         'faq': faq,
     }
     return render(request, 'faq.html', context)

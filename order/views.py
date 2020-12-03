@@ -16,7 +16,6 @@ def addtoshopcart(request, id):
     url = request.META.get('HTTP_REFERER')
     current_user = request.user
     product = Product.objects.get(pk=id)
-
     checkproduct = ShopCart.objects.filter(product_id=id)
     
     if checkproduct:
@@ -55,7 +54,6 @@ def addtoshopcart(request, id):
         return HttpResponseRedirect(url)
         
 def shopcart(request):
-    category = Category.objects.all()
     current_user = request.user
     shopcart = ShopCart.objects.filter(user_id = current_user.id)
     total = 0
@@ -65,9 +63,7 @@ def shopcart(request):
         count += rs.quantity 
     context = {
         'shopcart': shopcart,
-        'category': category,
         'total': total,
-        'count': count
     }
     return render(request, 'shopcart.html', context)
 
@@ -78,7 +74,7 @@ def deletefromcart(request, id):
     return HttpResponseRedirect("/shopcart")
 
 def orderproduct(request):
-    category = Category.objects.all()
+    
     current_user = request.user
     shopcart = ShopCart.objects.filter(user_id = current_user.id)
     total = 0
@@ -122,7 +118,7 @@ def orderproduct(request):
             ShopCart.objects.filter(user_id=current_user.id).delete()
             request.session['cart_item'] = 0 
             messages.success(request, 'Your order has been completed.')
-            return render(request, 'Order_Completed.html', {'ordercode': ordercode, 'category': category, 'count': count, 'total': total})
+            return render(request, 'Order_Completed.html', {'ordercode': ordercode,  'count': count, 'total': total})
         
         else:
             messages.warning(request, form.errors)
@@ -134,9 +130,7 @@ def orderproduct(request):
 
     context = {
         'shopcart': shopcart,
-        'category': category,
         'total': total,
-        'count': count,
         'form': form,
         'profile': profile,
     }

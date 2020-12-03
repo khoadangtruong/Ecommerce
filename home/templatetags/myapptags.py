@@ -19,3 +19,10 @@ def categorylist():
 def shopcartcount(userid):
     count = ShopCart.objects.filter(user_id=userid).count()
     return count
+
+@register.simple_tag
+def shopcarttotal(userid):
+    shopcart = ShopCart.objects.filter(user_id=userid)
+    total = sum(product.price for product in shopcart)
+    return total
+
