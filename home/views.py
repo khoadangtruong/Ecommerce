@@ -2,7 +2,7 @@ import random
 from django.core.paginator import Paginator
 from datetime import datetime
 from django.contrib import messages
-from django.http.response import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from home.models import Setting, ContactForm, ContactMessage, FAQ
 from product.models import Product, Category, Images, Comment
@@ -38,10 +38,9 @@ def index(request):
     current_user = request.user
     shopcart = ShopCart.objects.filter(user_id = current_user.id)
     total = 0
-    count = 0
+    
     for rs in shopcart:
         total += rs.product.price * rs.quantity
-        count += rs.quantity
 
     popular_products =  Product.objects.all().order_by('num_visits')[:1]
     popular_products_down =  Product.objects.all().order_by('-num_visits')[:1]
@@ -66,7 +65,6 @@ def index(request):
         'featured_products': featured_products,
         'best_sellers': best_sellers,
         'total': total,
-        'count': count,
         'recently_views_products': recently_views_products,
         'popular_products_down': popular_products_down,
         'popular_products': popular_products,
@@ -83,15 +81,14 @@ def about(request):
     current_user = request.user
     shopcart = ShopCart.objects.filter(user_id = current_user.id)
     total = 0
-    count = 0
+    
     for rs in shopcart:
         total += rs.product.price * rs.quantity
-        count += rs.quantity
+        
     context = {
         'setting': setting,
         'category': category,
         'total': total,
-        'count': count
     }
     return render(request, 'about.html', context)
 
@@ -115,16 +112,15 @@ def contact(request):
     current_user = request.user
     shopcart = ShopCart.objects.filter(user_id = current_user.id)
     total = 0
-    count = 0
+    
     for rs in shopcart:
         total += rs.product.price * rs.quantity
-        count += rs.quantity
+        
     context = {
         'setting': setting,
         'category': category,
         'form': form,
         'total': total,
-        'count': count
         }
     return render(request, 'contact.html', context)
 
@@ -142,10 +138,10 @@ def category_products(request, id, slug):
     current_user = request.user
     shopcart = ShopCart.objects.filter(user_id = current_user.id)
     total = 0
-    count = 0
+    
     for rs in shopcart:
         total += rs.product.price * rs.quantity
-        count += rs.quantity
+        
 
     popular_products =  Product.objects.all().order_by('-num_visits')[0:6]
     recently_views_products = Product.objects.all().order_by('-last_visit')[0:6]
@@ -156,7 +152,6 @@ def category_products(request, id, slug):
         'category': category,
         'setting': setting,
         'total': total,
-        'count': count,
         'recently_views_products': recently_views_products,
         'popular_products': popular_products,
     }
@@ -174,10 +169,10 @@ def shop(request):
     current_user = request.user
     shopcart = ShopCart.objects.filter(user_id = current_user.id)
     total = 0
-    count = 0
+    
     for rs in shopcart:
         total += rs.product.price * rs.quantity
-        count += rs.quantity
+        
     popular_products =  Product.objects.all().order_by('-num_visits')[0:6]
     
     recently_views_products = Product.objects.all().order_by('-last_visit')[0:6]
@@ -187,7 +182,6 @@ def shop(request):
         'all_products': all_products,
         'category': category,
         'total': total,
-        'count': count,
         'recently_views_products': recently_views_products,
         'popular_products': popular_products,
     }
@@ -215,10 +209,10 @@ def search(request):
             current_user = request.user
             shopcart = ShopCart.objects.filter(user_id = current_user.id)
             total = 0
-            count = 0
+            
             for rs in shopcart:
                 total += rs.product.price * rs.quantity
-                count += rs.quantity
+                
 
             popular_products =  Product.objects.all().order_by('-num_visits')[0:6]
             recently_views_products = Product.objects.all().order_by('-last_visit')[0:6]
@@ -228,7 +222,7 @@ def search(request):
                 'query': query,
                 'category': category,
                 'total': total,
-                'count': count,
+    
                 'recently_views_products': recently_views_products,
                 'popular_products': popular_products,
             }
@@ -253,10 +247,10 @@ def product_page(request, id, slug):
     current_user = request.user
     shopcart = ShopCart.objects.filter(user_id = current_user.id)
     total = 0
-    count = 0
+    
     for rs in shopcart:
         total += rs.product.price * rs.quantity
-        count += rs.quantity
+        
 
     
     product.count_sold = product.count_sold + 1
@@ -278,7 +272,6 @@ def product_page(request, id, slug):
         'images': images,
         'comments': comments,
         'total': total,
-        'count': count,
         'recently_views_products': recently_views_products,
         'popular_products': popular_products,
         'related_products': related_products,
@@ -297,14 +290,13 @@ def faq(request):
     current_user = request.user
     shopcart = ShopCart.objects.filter(user_id = current_user.id)
     total = 0
-    count = 0
+    
     for rs in shopcart:
         total += rs.product.price * rs.quantity
-        count += rs.quantity
+        
     context = {
         'category': category,
         'total': total,
-        'count': count,
         'faq': faq,
     }
     return render(request, 'faq.html', context)

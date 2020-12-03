@@ -152,6 +152,8 @@
 								<div class="cart_container d-flex flex-row align-items-center justify-content-end">
 									<div class="cart_icon">
 										<img src="{% static '' %}images/cart.png" alt="">
+										{% load myapptags %}
+										{% shopcartcount user.id as count %}
 										<div class="cart_count"><span>{{count}}</span></div> 
 									</div>
 									<div class="cart_content">
@@ -397,7 +399,7 @@
 								<li class="color"><a href="#" style="background: #ffffff; border: solid 1px #e1e1e1;"></a></li>
 							</ul>
 						</div>
-						<div class="sidebar_section">
+						{% comment %} <div class="sidebar_section">
 							<div class="sidebar_subtitle brands_subtitle">Brands</div>
 							<ul class="brands_list">
 								<li class="brand"><a href="#">Apple</a></li>
@@ -408,7 +410,7 @@
 								<li class="brand"><a href="#">Asus</a></li>
 								<li class="brand"><a href="#">Xiaomi</a></li>
 							</ul>
-						</div>
+						</div> {% endcomment %}
 					</div>
 
 				</div>
@@ -543,7 +545,7 @@
 
 	<!-- Brands -->
 
-	<div class="brands">
+	{% comment %} <div class="brands">
 		<div class="container">
 			<div class="row">
 				<div class="col">
@@ -701,7 +703,7 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 			</div>
 		</div>
 	</div>
-</div>
+</div> {% endcomment %}
 
 <script src="{% static '' %}js/jquery-3.3.1.min.js"></script>
 <script src="{% static '' %}styles/bootstrap4/popper.js"></script>

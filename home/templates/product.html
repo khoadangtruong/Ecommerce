@@ -152,6 +152,8 @@
 								<div class="cart_container d-flex flex-row align-items-center justify-content-end">
 									<div class="cart_icon">
 										<img src="{% static '' %}images/cart.png" alt="">
+										{% load myapptags %}
+										{% shopcartcount user.id as count %}
 										<div class="cart_count"><span>{{count}}</span></div> 
 									</div>
 									<div class="cart_content">
@@ -220,7 +222,7 @@
 							<div class="main_nav_menu ml-auto">
 								<ul class="standard_dropdown main_nav_dropdown">
 									<li><a href="{% url 'home' %}">Home<i class="fas fa-chevron-down"></i></a></li>
-									<li class="hassubs">
+									{% comment %} <li class="hassubs">
 										<a href="#">Featured Brands<i class="fas fa-chevron-down"></i></a>
 										<ul>
 											<li>
@@ -235,9 +237,10 @@
 											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 										</ul>
-									</li>
+									</li> {% endcomment %}
 									<li><a href="{% url 'shop'%}">Shop<i class="fas fa-chevron-down"></i></a></li>
 									<li><a href="blog.html">Blog<i class="fas fa-chevron-down"></i></a></li>
+									<li><a href="{% url 'faq'%}">FAQs<i class="fas fa-chevron-down"></i></a></li>
 									<li><a href="{% url 'about'%}">About US<i class="fas fa-chevron-down"></i></a></li>
 									<li><a href="{% url 'contact'%}">Contact<i class="fas fa-chevron-down"></i></a></li>
 								</ul>
@@ -392,14 +395,21 @@
 									<!-- Product Quantity -->
 									<div class="product_quantity clearfix">
 										<span>Quantity: </span>
-										<input id="quantity_input" name="quantity" type="number" value="1" min="1" max={{ product.amount }} style="width: 70px;">
+										<input id="quantity_input" name="quantity" type="number" value="1" min="0" max={{ product.amount }} style="width: 70px;">
 									</div>
+
+									{% comment %} <div class="product_quantity clearfix">
+										<span>Size: </span>
+										<input id="quantity_input" name="quantity" type="number" value="1" min="1" max={{ product.amount }} style="width: 70px;">
+									</div> {% endcomment %}
 
 									<!-- Product Color -->
 									<ul class="product_color">
 										<li>
 											<span>Color: </span>
-											<div class="color_mark_container"><div id="selected_color" class="color_mark"></div></div>
+											<div class="color_mark_container">
+												<div id="selected_color" class="color_mark"></div>
+											</div>
 											<div class="color_dropdown_button"><i class="fas fa-chevron-down"></i></div>
 
 											<ul class="color_list">
@@ -414,7 +424,7 @@
 
 								<div class="product_price" style="color: red;">${{ product.price }}</div>
 								<div class="button_container">
-									<button type="submit" class="button cart_button">Add to Cart</button>
+									<button type="submit" {% if product.amount < 1 %} disabled {% endif %} class="button cart_button">Add to Cart</button>
 									<div class="product_fav"><i class="fas fa-heart"></i></div>
 								</div>
 								
@@ -534,6 +544,39 @@
 		</div>
 	</div>
 
+	<!-- Brands -->
+
+	{% comment %} <div class="brands">
+		<div class="container">
+			<div class="row">
+				<div class="col">
+					<div class="brands_slider_container">
+						
+						<!-- Brands Slider -->
+
+						<div class="owl-carousel owl-theme brands_slider">
+							
+							<div class="owl-item"><div class="brands_item d-flex flex-column justify-content-center"><img src="{% static '' %}images/brands_1.jpg" alt=""></div></div>
+							<div class="owl-item"><div class="brands_item d-flex flex-column justify-content-center"><img src="{% static '' %}images/brands_2.jpg" alt=""></div></div>
+							<div class="owl-item"><div class="brands_item d-flex flex-column justify-content-center"><img src="{% static '' %}images/brands_3.jpg" alt=""></div></div>
+							<div class="owl-item"><div class="brands_item d-flex flex-column justify-content-center"><img src="{% static '' %}images/brands_4.jpg" alt=""></div></div>
+							<div class="owl-item"><div class="brands_item d-flex flex-column justify-content-center"><img src="{% static '' %}images/brands_5.jpg" alt=""></div></div>
+							<div class="owl-item"><div class="brands_item d-flex flex-column justify-content-center"><img src="{% static '' %}images/brands_6.jpg" alt=""></div></div>
+							<div class="owl-item"><div class="brands_item d-flex flex-column justify-content-center"><img src="{% static '' %}images/brands_7.jpg" alt=""></div></div>
+							<div class="owl-item"><div class="brands_item d-flex flex-column justify-content-center"><img src="{% static '' %}images/brands_8.jpg" alt=""></div></div>
+
+						</div>
+						
+						<!-- Brands Slider Navigation -->
+						<div class="brands_nav brands_prev"><i class="fas fa-chevron-left"></i></div>
+						<div class="brands_nav brands_next"><i class="fas fa-chevron-right"></i></div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div> {% endcomment %}
+
 	<!-- Related products -->
 
 	<div class="viewed">
@@ -579,42 +622,9 @@
 		</div>
 	</div>
 
-	<!-- Brands -->
-
-	<div class="brands">
-		<div class="container">
-			<div class="row">
-				<div class="col">
-					<div class="brands_slider_container">
-						
-						<!-- Brands Slider -->
-
-						<div class="owl-carousel owl-theme brands_slider">
-							
-							<div class="owl-item"><div class="brands_item d-flex flex-column justify-content-center"><img src="{% static '' %}images/brands_1.jpg" alt=""></div></div>
-							<div class="owl-item"><div class="brands_item d-flex flex-column justify-content-center"><img src="{% static '' %}images/brands_2.jpg" alt=""></div></div>
-							<div class="owl-item"><div class="brands_item d-flex flex-column justify-content-center"><img src="{% static '' %}images/brands_3.jpg" alt=""></div></div>
-							<div class="owl-item"><div class="brands_item d-flex flex-column justify-content-center"><img src="{% static '' %}images/brands_4.jpg" alt=""></div></div>
-							<div class="owl-item"><div class="brands_item d-flex flex-column justify-content-center"><img src="{% static '' %}images/brands_5.jpg" alt=""></div></div>
-							<div class="owl-item"><div class="brands_item d-flex flex-column justify-content-center"><img src="{% static '' %}images/brands_6.jpg" alt=""></div></div>
-							<div class="owl-item"><div class="brands_item d-flex flex-column justify-content-center"><img src="{% static '' %}images/brands_7.jpg" alt=""></div></div>
-							<div class="owl-item"><div class="brands_item d-flex flex-column justify-content-center"><img src="{% static '' %}images/brands_8.jpg" alt=""></div></div>
-
-						</div>
-						
-						<!-- Brands Slider Navigation -->
-						<div class="brands_nav brands_prev"><i class="fas fa-chevron-left"></i></div>
-						<div class="brands_nav brands_next"><i class="fas fa-chevron-right"></i></div>
-
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
 	<!-- Recently Viewed -->
 
-	<div class="viewed">
+	{% comment %} <div class="viewed">
 		<div class="container">
 			<div class="row">
 				<div class="col">
@@ -642,8 +652,8 @@
 											<div class="viewed_name"><a href="/product/{{ rs.id }}/{{ rs.slug }}">{{rs.title}}</a></div>
 										</div>
 										<ul class="item_marks">
-											{% comment %} <li class="item_mark item_discount">-25%</li>
-											<li class="item_mark item_new">new</li> {% endcomment %}
+											<li class="item_mark item_discount">-25%</li>
+											<li class="item_mark item_new">new</li> 
 										</ul>
 									</div>
 								</div>
@@ -655,11 +665,11 @@
 				</div>
 			</div>
 		</div>
-	</div>
+	</div> {% endcomment %}
 
 	<!-- Newsletter -->
 
-	<div class="newsletter">
+	{% comment %} <div class="newsletter">
 		<div class="container">
 			<div class="row">
 				<div class="col">
@@ -680,11 +690,11 @@
 				</div>
 			</div>
 		</div>
-	</div>
+	</div> {% endcomment %}
 
 	<!-- Footer -->
 
-	<footer class="footer">
+	{% comment %} <footer class="footer">
 		<div class="container">
 			<div class="row">
 
@@ -784,7 +794,7 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 			</div>
 		</div>
 	</div>
-</div>
+</div> {% endcomment %}
 
 <script src="{% static '' %}js/jquery-3.3.1.min.js"></script>
 <script src="{% static '' %}styles/bootstrap4/popper.js"></script>

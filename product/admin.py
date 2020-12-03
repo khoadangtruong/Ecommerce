@@ -45,7 +45,10 @@ class CategoryAdmin2(DraggableMPTTAdmin):
 
 class ProductImageInline(admin.TabularInline):
     model = Images
-    extra = 3
+    readonly_fields = ('id',)
+    extra = 1
+class ImagesAdmin(admin.ModelAdmin):
+    list_display = ['image', 'title', 'image_thumbnail']
 
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['title', 'category', 'status', 'image_tag']
@@ -53,11 +56,11 @@ class ProductAdmin(admin.ModelAdmin):
     readonly_fields = ('image_tag',)
     inlines = [ProductImageInline]
     prepopulated_fields = {'slug': ('title',)}
-
 class CommentAdmin(admin.ModelAdmin):
     list_display = ['subject', 'comment', 'status', 'create_at']
     list_filter = ['status',]
     readonly_fields = ('subject', 'comment', 'ip', 'user', 'product', 'rate')
+
 
 admin.site.register(Category, CategoryAdmin2)
 admin.site.register(Product, ProductAdmin)

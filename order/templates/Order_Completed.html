@@ -135,6 +135,8 @@
 								<div class="cart_container d-flex flex-row align-items-center justify-content-end">
 									<div class="cart_icon">
 										<img src="{% static '' %}images/cart.png" alt="">
+										{% load myapptags %}
+										{% shopcartcount user.id as count %}
 										<div class="cart_count"><span>{{count}}</span></div>
 									</div>
 									<div class="cart_content">
@@ -218,7 +220,7 @@
 											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 										</ul>
 									</li> {% endcomment %}
-									<li class="hassubs">
+									{% comment %} <li class="hassubs">
 										<a href="#">Featured Brands<i class="fas fa-chevron-down"></i></a>
 										<ul>
 											<li>
@@ -233,9 +235,10 @@
 											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 										</ul>
-									</li>
+									</li> {% endcomment %}
 									<li><a href="{% url 'shop'%}">Shop<i class="fas fa-chevron-down"></i></a></li>
 									<li><a href="blog.html">Blog<i class="fas fa-chevron-down"></i></a></li>
+									<li><a href="{% url 'faq'%}">Faqs<i class="fas fa-chevron-down"></i></a></li>
 									<li><a href="{% url 'about'%}">About US<i class="fas fa-chevron-down"></i></a></li>
 									<li><a href="{% url 'contact'%}">Contact<i class="fas fa-chevron-down"></i></a></li>
 								</ul>
@@ -360,7 +363,6 @@
                         <h3>Your order is completed</h3>
                         <h3>Order code: {{ordercode}}</h3>
                         <h3>Thank you</h3>
-                        <hr>
 					</div>
 				</div>
 			</div>
@@ -369,7 +371,7 @@
 
 	<!-- Newsletter -->
 
-	<div class="newsletter">
+	{% comment %} <div class="newsletter">
 		<div class="container">
 			<div class="row">
 				<div class="col">
@@ -494,7 +496,7 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 			</div>
 		</div>
 	</div>
-</div>
+</div> {% endcomment %}
 
 <script src="{% static '' %}js/jquery-3.3.1.min.js"></script>
 <script src="{% static '' %}styles/bootstrap4/popper.js"></script>
