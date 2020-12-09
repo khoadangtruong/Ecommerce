@@ -2,7 +2,7 @@ from django.utils.crypto import get_random_string
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from user.models import UserProfile
-from product.models import Category, Product
+from product.models import Product
 from order.models import ShopCart, ShopCartForm, OrderForm, Order, OrderProduct
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -65,6 +65,7 @@ def shopcart(request):
         'shopcart': shopcart,
         'total': total,
     }
+
     return render(request, 'shopcart.html', context)
 
 @login_required(login_url='/login')

@@ -22,13 +22,23 @@ from order import views as OrderViews
 from user import views as UserViews
 
 urlpatterns = [
+    path('selectcurrency', views.selectcurrency, name='selectcurrency'),
+    path('savelangcur', views.savelangcur, name='savelangcur'),
+]
+
+urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='home'),
     path('home/',include('home.urls')),
     path('product/',include('product.urls')),
     path('order/',include('order.urls')),
     path('user/',include('user.urls')),
+    path('blog/',include('blog.urls')),
     path('ckeditor/', include('ckeditor_uploader.urls')),
+    path('currencies/',include('currencies.urls')),
+
+    path('selectcurrency', views.selectcurrency, name='selectcurrency'),
+    path('savelangcur', views.savelangcur, name='savelangcur'),
 
     path('about/',views.about, name='about'),
     path('faq/',views.faq, name='faq'),

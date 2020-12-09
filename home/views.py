@@ -7,15 +7,20 @@ from django.shortcuts import render
 from home.models import Setting, ContactForm, ContactMessage, FAQ
 from product.models import Product, Category, Images, Comment
 from home.form import SearchForm
-from order.models import ShopCart
+from django.contrib.auth.decorators import login_required
+from user.models import UserProfile
+from Ecommerce import settings
+
 
 
 def index(request):
+    if not request.session.has_key('currency'):
+        request.session['currency'] = settings.DEFAULT_CURRENCY
+
     setting = Setting.objects.get(pk = 1)
-    products_top10 = Product.objects.all().order_by('?')[:10]
+    products_top10 = Product.objects.all().order_by('?')[:1]
     Laptop = Product.objects.filter(category_id = 1).order_by('?')[:10]
     Smartphone = Product.objects.filter(category_id = 2).order_by('?')[:10]
-    Smartphone_single_new_arrived = Product.objects.filter(category_id = 2).order_by('?')[:1]
     Audio = Product.objects.filter(category_id = 12).order_by('?')[:10]
     Desktop = Product.objects.filter(category_id = 8).order_by('?')[:10]
     Tablet = Product.objects.filter(category_id = 9).order_by('?')[:8]
@@ -28,12 +33,11 @@ def index(request):
     audio_best_sellers = Product.objects.filter(category_id = 12).order_by('-count_sold')[:6]
     laptop_best_sellers = Product.objects.filter(category_id = 1).order_by('count_sold')[:8]
 
-    product_on_sale = Product.objects.all().order_by('-on_sale')[:5]
-
     page = 'home'
 
-    popular_products =  Product.objects.all().order_by('num_visits')[:1]
-    popular_products_down =  Product.objects.all().order_by('-num_visits')[:1]
+    popular_products =  Product.objects.all().order_by('num_visits')[1:2]
+    popular_products_down =  Product.objects.all().order_by('-num_visits')[10:11]
+    main_popular_products_down =  Product.objects.all().order_by('-num_visits')[:10]
 
     recently_views_products = Product.objects.all().order_by('-last_visit')[0:20]
 
@@ -46,7 +50,6 @@ def index(request):
         'Laptop': Laptop,
         'Audio': Audio,
         'Smartphone': Smartphone,
-        'Smartphone_single_new_arrived': Smartphone_single_new_arrived,
         'Desktop': Desktop,
         'Tablet': Tablet,
         'Gears': Gears,
@@ -56,8 +59,8 @@ def index(request):
         'recently_views_products': recently_views_products,
         'popular_products_down': popular_products_down,
         'popular_products': popular_products,
+        'main_popular_products_down': main_popular_products_down,
         'comments': comments,
-        'product_on_sale': product_on_sale,
         'audio_best_sellers': audio_best_sellers,
         'laptop_best_sellers': laptop_best_sellers,
     }
@@ -119,7 +122,6 @@ def category_products(request, id, slug):
 
 def shop(request):
     setting = Setting.objects.get(pk = 1)
-    
 
     all_products = Product.objects.all().order_by('?')
     paginator = Paginator(all_products, 20)
@@ -127,7 +129,6 @@ def shop(request):
     all_products = paginator.get_page(page)
         
     popular_products =  Product.objects.all().order_by('-num_visits')[0:6]
-    
     recently_views_products = Product.objects.all().order_by('-last_visit')[0:6]
 
     context = {
@@ -193,9 +194,6 @@ def product_page(request, id, slug):
 
     product.save()
 
-    if product.on_sale is True:
-        product.price = product.price - (product.price * 0.25)
-
     context = {
         'product': product,
         'images': images,
@@ -217,3 +215,17 @@ def faq(request):
         'faq': faq,
     }
     return render(request, 'faq.html', context)
+
+def selectcurrency(request):
+    lasturl = request.META.get('HTTP_REFERER')
+    if request.method == 'POST':  
+        request.session['currency'] = request.POST['currency']
+    return HttpResponseRedirect(lasturl)
+
+@login_required(login_url='/login')
+def savelangcur(request):
+    lasturl = request.META.get('HTTP_REFERER')
+    current_user = request.user
+    data = UserProfile.objects.get(user_id=current_user.id )
+    data.currency_id = request.session['currency']
+    return HttpResponseRedirect(lasturl)

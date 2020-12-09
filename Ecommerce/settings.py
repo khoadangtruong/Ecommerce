@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'ckeditor',
     'mptt',
     'crispy_forms',
+    'currencies',
+    'blog',
 ]
 
 MIDDLEWARE = [
@@ -70,6 +72,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'currencies.context_processors.currencies',
             ],
         },
     },
@@ -115,17 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-
-# LANGUAGES = [
-#     ('en', _('English')),
-#     ('ita', _('Italian')),
-#     ('span', _('Spanish')),
-#     ('jap', _('Japanese')),
-# ]
-
-# LOCALE_PATHS = (
-#     os.path.join(BASE_DIR, 'locale'),
-# )
+DEFAULT_CURRENCY = 'USD'
 
 LANGUAGE_CODE = 'en-us'
 

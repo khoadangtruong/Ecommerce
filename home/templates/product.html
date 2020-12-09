@@ -3,6 +3,7 @@
 <head>
 <title>{{product}}</title>
 {% load static %}
+{% load currency %}
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="description" content="OneTech shop project">
@@ -48,12 +49,21 @@
 										</ul>
 									</li>
 									<li>
-										<a href="#">$ US dollar<i class="fas fa-chevron-down"></i></a>
-										<ul>
-											<li><a href="#">EUR Euro</a></li>
-											<li><a href="#">GBP British Pound</a></li>
-											<li><a href="#">JPY Japanese Yen</a></li>
-										</ul>
+										<form id="currency_switcher" method="POST" action="{% url 'selectcurrency' %}">
+											{% csrf_token %}
+											<select name="currency" onchange="submit()" >
+												{% for curr in CURRENCIES %}
+													<option value="{{ curr.code }}"
+															{% ifequal curr.code request.session.currency %}selected="selected"{% endifequal %}>
+														{{ curr.symbol }} {{ curr.name }}
+													</option>
+												{% endfor %}
+											</select>
+
+											<noscript>
+												<input type="submit" value="Set" />
+											</noscript>
+										</form>
 									</li>
 									<li>
 										{% if user.id is not None%}
@@ -160,7 +170,7 @@
 										<div class="cart_text"><a href="/shopcart/">Cart</a></div>
 										{% load myapptags %}
 										{% shopcarttotal user.id as total %}
-										<div class="cart_price">${{total}}</div>
+										<div class="cart_price">{{ total|currency:request.session.currency }} {{ request.session.currency }}</div>
 									</div>
 								</div>
 							</div>
@@ -243,7 +253,7 @@
 										</ul>
 									</li> {% endcomment %}
 									<li><a href="{% url 'shop'%}">Shop<i class="fas fa-chevron-down"></i></a></li>
-									<li><a href="blog.html">Blog<i class="fas fa-chevron-down"></i></a></li>
+									<li><a href="{% url 'blog'%}">Blog<i class="fas fa-chevron-down"></i></a></li> 
 									<li><a href="{% url 'faq'%}">FAQs<i class="fas fa-chevron-down"></i></a></li>
 									<li><a href="{% url 'about'%}">About US<i class="fas fa-chevron-down"></i></a></li>
 									<li><a href="{% url 'contact'%}">Contact<i class="fas fa-chevron-down"></i></a></li>
@@ -402,11 +412,6 @@
 										<input id="quantity_input" name="quantity" type="number" value="1" min="0" max={{ product.amount }} style="width: 70px;">
 									</div>
 
-									{% comment %} <div class="product_quantity clearfix">
-										<span>Size: </span>
-										<input id="quantity_input" name="quantity" type="number" value="1" min="1" max={{ product.amount }} style="width: 70px;">
-									</div> {% endcomment %}
-
 									<!-- Product Color -->
 									<ul class="product_color">
 										<li>
@@ -426,7 +431,7 @@
 
 								</div>
 
-								<div class="product_price" style="color: red;">${{ product.price }}</div>
+								<div class="product_price" style="color: red;">{{ product.price|currency:request.session.currency }} {{ request.session.currency }}</div>
 								<div class="button_container">
 									<button type="submit" {% if product.amount < 1 %} disabled {% endif %} class="button cart_button">Add to Cart</button>
 									<div class="product_fav"><i class="fas fa-heart"></i></div>
@@ -607,7 +612,7 @@
 									<div class="viewed_item discount d-flex flex-column align-items-center justify-content-center text-center">
 										<div class="viewed_image"><img src="{{rs.image.url}}" alt=""></div>
 										<div class="viewed_content text-center">
-											<div class="viewed_price">${{rs.price}}</div>
+											<div class="viewed_price">{{rs.price|currency:request.session.currency}} {{request.session.currency}}</div>
 											<div class="viewed_name"><a href="/product/{{ rs.id }}/{{ rs.slug }}">{{rs.title}}</a></div>
 										</div>
 										<ul class="item_marks">

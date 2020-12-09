@@ -1,18 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Blog</title>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="description" content="OneTech shop project">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" type="text/css" href="styles/bootstrap4/bootstrap.min.css">
-<link href="plugins/fontawesome-free-5.0.1/css/fontawesome-all.css" rel="stylesheet" type="text/css">
-<link rel="stylesheet" type="text/css" href="plugins/OwlCarousel2-2.2.1/owl.carousel.css">
-<link rel="stylesheet" type="text/css" href="plugins/OwlCarousel2-2.2.1/owl.theme.default.css">
-<link rel="stylesheet" type="text/css" href="plugins/OwlCarousel2-2.2.1/animate.css">
-<link rel="stylesheet" type="text/css" href="styles/blog_styles.css">
-<link rel="stylesheet" type="text/css" href="styles/blog_responsive.css">
+	{%load static%}
+	{% load i18n %}
+	{% load currency %}
+	<title>{{setting.title}}</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="description" content="OneTech shop project">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="{% static '' %}styles/bootstrap4/bootstrap.min.css">
+	<link href="{% static '' %}plugins/fontawesome-free-5.0.1/css/fontawesome-all.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" type="text/css" href="{% static '' %}plugins/OwlCarousel2-2.2.1/owl.carousel.css">
+	<link rel="stylesheet" type="text/css" href="{% static '' %}plugins/OwlCarousel2-2.2.1/owl.theme.default.css">
+	<link rel="stylesheet" type="text/css" href="{% static '' %}plugins/OwlCarousel2-2.2.1/animate.css">
+	<link rel="stylesheet" type="text/css" href="{% static '' %}styles/blog_styles.css">
+	<link rel="stylesheet" type="text/css" href="{% static '' %}styles/blog_responsive.css">
+	<link rel="stylesheet" type="text/css" href="{% static '' %}styles/responsive.css">
+	<link rel="stylesheet" type="text/css" href="{% static '' %}styles/pages.css">
+	<link rel="stylesheet" type="text/css" href="{% static '' %}styles/shop_styles.css">
+	<link rel="stylesheet" type="text/css" href="{% static '' %}styles/shop_responsive.css">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
 </head>
 
@@ -30,8 +38,8 @@
 			<div class="container">
 				<div class="row">
 					<div class="col d-flex flex-row">
-						<div class="top_bar_contact_item"><div class="top_bar_icon"><img src="images/phone.png" alt=""></div>+38 068 005 3570</div>
-						<div class="top_bar_contact_item"><div class="top_bar_icon"><img src="images/mail.png" alt=""></div><a href="mailto:fastsales@gmail.com">fastsales@gmail.com</a></div>
+						<div class="top_bar_contact_item"><div class="top_bar_icon"><img src="{% static '' %}images/phone.png" alt=""></div>+38 068 005 3570</div>
+						<div class="top_bar_contact_item"><div class="top_bar_icon"><img src="{% static '' %}images/mail.png" alt=""></div><a href="mailto:fastsales@gmail.com">fastsales@gmail.com</a></div>
 						<div class="top_bar_content ml-auto">
 							<div class="top_bar_menu">
 								<ul class="standard_dropdown top_bar_dropdown">
@@ -44,23 +52,49 @@
 										</ul>
 									</li>
 									<li>
-										<a href="#">$ US dollar<i class="fas fa-chevron-down"></i></a>
-										<ul>
-											<li><a href="#">EUR Euro</a></li>
-											<li><a href="#">GBP British Pound</a></li>
-											<li><a href="#">JPY Japanese Yen</a></li>
-										</ul>
+										<form id="currency_switcher" method="POST" action="{% url 'selectcurrency' %}">
+											{% csrf_token %}
+											<select name="currency" onchange="submit()" >
+												{% for curr in CURRENCIES %}
+													<option value="{{ curr.code }}"
+															{% ifequal curr.code request.session.currency %}selected="selected"{% endifequal %}>
+														{{ curr.symbol }} {{ curr.name }}
+													</option>
+												{% endfor %}
+											</select>
+
+											<noscript>
+												<input type="submit" value="Set" />
+											</noscript>
+										</form>
+									</li>
+									<li>
+										{% if user.id is not None%}
+											<a class="user_icon"><img src="{{ request.session.userimage }}" style="height: 28px; width: 30px; border-radius: 30%;" alt="">Hello, {{ user.first_name }}</a>
+												<ul>
+													<li><a href="/user">User profile</a></li>
+													<li><a href="/logout">Logout</a></li>
+												</ul>
+										{% else %}
+											<div class="top_bar_user">
+												<div class="user_icon"><img src="{% static 'images/user.svg ' %}" alt=""></div>
+												<div><a href="/register">Register</a></div>
+												<div><a href="/login">Sign in</a></div>
+											</div>
+										{% endif %}
 									</li>
 								</ul>
-							</div>
-							<div class="top_bar_user">
-								<div class="user_icon"><img src="images/user.svg" alt=""></div>
-								<div><a href="#">Register</a></div>
-								<div><a href="#">Sign in</a></div>
 							</div>
 						</div>
 					</div>
 				</div>
+				{% comment %} {% if messages %}
+					{% for message in messages %}
+						<div class="alert alert-{{message.tags}}" role="alert" style="text-align: center; color: red;">
+							{{ message }}
+						</div>
+					{% endfor %}
+				{% endif %} {% endcomment %}
 			</div>		
 		</div>
 
@@ -73,7 +107,7 @@
 					<!-- Logo -->
 					<div class="col-lg-2 col-sm-3 col-3 order-1">
 						<div class="logo_container">
-							<div class="logo"><a href="#">OneTech</a></div>
+							<div class="logo"><a href="{% url 'home' %}">OneTech</a></div>
 						</div>
 					</div>
 
@@ -82,50 +116,53 @@
 						<div class="header_search">
 							<div class="header_search_content">
 								<div class="header_search_form_container">
-									<form action="#" class="header_search_form clearfix">
-										<input type="search" required="required" class="header_search_input" placeholder="Search for products...">
+									<form action="/search/" method="POST" class="header_search_form clearfix">
+										{% csrf_token %}
+										<input id="query" name="query" type="search" required="required" class="header_search_input" placeholder="Search for products...">
 										<div class="custom_dropdown">
 											<div class="custom_dropdown_list">
 												<span class="custom_dropdown_placeholder clc">All Categories</span>
 												<i class="fas fa-chevron-down"></i>
+												{% load mptt_tags %}
 												<ul class="custom_list clc">
-													<li><a class="clc" href="#">All Categories</a></li>
-													<li><a class="clc" href="#">Computers</a></li>
-													<li><a class="clc" href="#">Laptops</a></li>
-													<li><a class="clc" href="#">Cameras</a></li>
-													<li><a class="clc" href="#">Hardware</a></li>
-													<li><a class="clc" href="#">Smartphones</a></li>
+													<select name="catid" class="input search-categories">
+														<option class="clc" value="0"></option>
+													</select>
 												</ul>
 											</div>
 										</div>
-										<button type="submit" class="header_search_button trans_300" value="Submit"><img src="images/search.png" alt=""></button>
+										<button type="submit" class="header_search_button trans_300" value="Submit"><img src="{% static '' %}images/search.png" alt=""></button>
 									</form>
 								</div>
 							</div>
 						</div>
 					</div>
 
-					<!-- Wishlist -->
+					
 					<div class="col-lg-4 col-9 order-lg-3 order-2 text-lg-left text-right">
 						<div class="wishlist_cart d-flex flex-row align-items-center justify-content-end">
 							<div class="wishlist d-flex flex-row align-items-center justify-content-end">
-								<div class="wishlist_icon"><img src="images/heart.png" alt=""></div>
+								<div class="wishlist_icon"><img src="{% static '' %}images/heart.png" alt=""></div>
 								<div class="wishlist_content">
-									<div class="wishlist_text"><a href="#">Wishlist</a></div>
+									<div class="wishlist_text"><a href="/user/favorites">Wishlist</a></div>
 									<div class="wishlist_count">115</div>
 								</div>
 							</div>
 
-							<!-- Cart -->
+							
 							<div class="cart">
 								<div class="cart_container d-flex flex-row align-items-center justify-content-end">
 									<div class="cart_icon">
-										<img src="images/cart.png" alt="">
-										<div class="cart_count"><span>10</span></div>
+										<img src="{% static '' %}images/cart.png" alt="">
+										{% load myapptags %}
+										{% shopcartcount user.id as count %}
+										<div class="cart_count" style="color: white">{{count}}</div>
 									</div>
 									<div class="cart_content">
-										<div class="cart_text"><a href="#">Cart</a></div>
-										<div class="cart_price">$85</div>
+										<div class="cart_text"><a href="/shopcart/">Cart</a></div>
+										{% load myapptags %}
+										{% shopcarttotal user.id as total %}
+										<div class="cart_price">{{ total|currency:request.session.currency }} {{ request.session.currency }}</div>
 									</div>
 								</div>
 							</div>
@@ -151,10 +188,13 @@
 									<div class="cat_burger"><span></span><span></span><span></span></div>
 									<div class="cat_menu_text">categories</div>
 								</div>
-
+								{% load myapptags %}
+								{% categorylist as category %}
+								{% load mptt_tags %}
 								<ul class="cat_menu">
-									<li><a href="#">Computers & Laptops <i class="fas fa-chevron-right ml-auto"></i></a></li>
-									<li><a href="#">Cameras & Photos<i class="fas fa-chevron-right"></i></a></li>
+									{% recursetree category %}
+										<li><a href="/category/{{node.id}}/{{node.slug}}">{{node.title}} <i class="fas fa-chevron-right ml-auto"></i></a></li>
+									{% comment %} <li><a href="#">Cameras & Photos<i class="fas fa-chevron-right"></i></a></li>
 									<li class="hassubs">
 										<a href="#">Hardware<i class="fas fa-chevron-right"></i></a>
 										<ul>
@@ -177,7 +217,8 @@
 									<li><a href="#">Gadgets<i class="fas fa-chevron-right"></i></a></li>
 									<li><a href="#">Car Electronics<i class="fas fa-chevron-right"></i></a></li>
 									<li><a href="#">Video Games & Consoles<i class="fas fa-chevron-right"></i></a></li>
-									<li><a href="#">Accessories<i class="fas fa-chevron-right"></i></a></li>
+									<li><a href="#">Accessories<i class="fas fa-chevron-right"></i></a></li> {% endcomment %}
+									{% endrecursetree %}
 								</ul>
 							</div>
 
@@ -185,8 +226,8 @@
 
 							<div class="main_nav_menu ml-auto">
 								<ul class="standard_dropdown main_nav_dropdown">
-									<li><a href="index.html">Home<i class="fas fa-chevron-down"></i></a></li>
-									<li class="hassubs">
+									<li><a href="{% url 'home' %}">Home<i class="fas fa-chevron-down"></i></a></li>
+									{% comment %} <li class="hassubs">
 										<a href="#">Super Deals<i class="fas fa-chevron-down"></i></a>
 										<ul>
 											<li>
@@ -201,37 +242,22 @@
 											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 										</ul>
-									</li>
-									<li class="hassubs">
+									</li> {% endcomment %}
+									{% comment %} <li class="hassubs">
 										<a href="#">Featured Brands<i class="fas fa-chevron-down"></i></a>
 										<ul>
-											<li>
-												<a href="#">Menu Item<i class="fas fa-chevron-down"></i></a>
-												<ul>
-													<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
-													<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
-													<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
-												</ul>
-											</li>
+											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 										</ul>
-									</li>
-									<li class="hassubs">
-										<a href="#">Pages<i class="fas fa-chevron-down"></i></a>
-										<ul>
-											<li><a href="shop.html">Shop<i class="fas fa-chevron-down"></i></a></li>
-											<li><a href="product.html">Product<i class="fas fa-chevron-down"></i></a></li>
-											<li><a href="blog.html">Blog<i class="fas fa-chevron-down"></i></a></li>
-											<li><a href="blog_single.html">Blog Post<i class="fas fa-chevron-down"></i></a></li>
-											<li><a href="regular.html">Regular Post<i class="fas fa-chevron-down"></i></a></li>
-											<li><a href="cart.html">Cart<i class="fas fa-chevron-down"></i></a></li>
-											<li><a href="contact.html">Contact<i class="fas fa-chevron-down"></i></a></li>
-										</ul>
-									</li>
-									<li><a href="blog.html">Blog<i class="fas fa-chevron-down"></i></a></li>
-									<li><a href="contact.html">Contact<i class="fas fa-chevron-down"></i></a></li>
+									</li> {% endcomment %}
+
+									<li><a href="{% url 'shop'%}">Shop<i class="fas fa-chevron-down"></i></a></li>
+									<li><a href="{% url 'blog'%}">Blog<i class="fas fa-chevron-down"></i></a></li>
+									<li><a href="{% url 'faq'%}">FAQs<i class="fas fa-chevron-down"></i></a></li> 
+									<li><a href="{% url 'about'%}">About US<i class="fas fa-chevron-down"></i></a></li>
+									<li><a href="{% url 'contact'%}">Contact<i class="fas fa-chevron-down"></i></a></li>
 								</ul>
 							</div>
 
@@ -286,7 +312,7 @@
 									</ul>
 								</li>
 								<li class="page_menu_item">
-									<a href="index.html">Home<i class="fa fa-angle-down"></i></a>
+									<a href="#">Home<i class="fa fa-angle-down"></i></a>
 								</li>
 								<li class="page_menu_item has-children">
 									<a href="#">Super Deals<i class="fa fa-angle-down"></i></a>
@@ -324,13 +350,13 @@
 										<li><a href="#">Menu Item<i class="fa fa-angle-down"></i></a></li>
 									</ul>
 								</li>
-								<li class="page_menu_item"><a href="#">blog<i class="fa fa-angle-down"></i></a></li>
+								<li class="page_menu_item"><a href="blog.html">blog<i class="fa fa-angle-down"></i></a></li>
 								<li class="page_menu_item"><a href="contact.html">contact<i class="fa fa-angle-down"></i></a></li>
 							</ul>
 							
 							<div class="menu_contact">
-								<div class="menu_contact_item"><div class="menu_contact_icon"><img src="images/phone_white.png" alt=""></div>+38 068 005 3570</div>
-								<div class="menu_contact_item"><div class="menu_contact_icon"><img src="images/mail_white.png" alt=""></div><a href="mailto:fastsales@gmail.com">fastsales@gmail.com</a></div>
+								<div class="menu_contact_item"><div class="menu_contact_icon"><img src="{% static '' %}images/phone_white.png" alt=""></div>+38 068 005 3570</div>
+								<div class="menu_contact_item"><div class="menu_contact_icon"><img src="{% static '' %}images/mail_white.png" alt=""></div><a href="mailto:fastsales@gmail.com">fastsales@gmail.com</a></div>
 							</div>
 						</div>
 					</div>
@@ -358,79 +384,58 @@
 				<div class="col">
 					<div class="blog_posts d-flex flex-row align-items-start justify-content-between">
 						
-						<!-- Blog post -->
-						<div class="blog_post">
-							<div class="blog_image" style="background-image:url(images/blog_1.jpg)"></div>
-							<div class="blog_text">Vivamus sed nunc in arcu cursus mollis quis et orci. Interdum et malesuada.</div>
-							<div class="blog_button"><a href="blog_single.html">Continue Reading</a></div>
-						</div>
-
-						<!-- Blog post -->
-						<div class="blog_post">
-							<div class="blog_image" style="background-image:url(images/blog_2.jpg)"></div>
-							<div class="blog_text">Cras lobortis nisl nec libero pulvinar lacinia. Nunc sed ullamcorper massa.</div>
-							<div class="blog_button"><a href="blog_single.html">Continue Reading</a></div>
-						</div>
-
-						<!-- Blog post -->
-						<div class="blog_post">
-							<div class="blog_image" style="background-image:url(images/blog_3.jpg)"></div>
-							<div class="blog_text">Fusce tincidunt nulla magna, ac euismod quam viverra id. Fusce eget metus feugiat</div>
-							<div class="blog_button"><a href="blog_single.html">Continue Reading</a></div>
-						</div>
-
-						<!-- Blog post -->
-						<div class="blog_post">
-							<div class="blog_image" style="background-image:url(images/blog_4.jpg)"></div>
-							<div class="blog_text">Etiam leo nibh, consectetur nec orci et, tempus tempus ex</div>
-							<div class="blog_button"><a href="blog_single.html">Continue Reading</a></div>
-						</div>
-
-						<!-- Blog post -->
-						<div class="blog_post">
-							<div class="blog_image" style="background-image:url(images/blog_5.jpg)"></div>
-							<div class="blog_text">Sed viverra pellentesque dictum. Aenean ligula justo, viverra in lacus porttitor</div>
-							<div class="blog_button"><a href="blog_single.html">Continue Reading</a></div>
-						</div>
-
-						<!-- Blog post -->
-						<div class="blog_post">
-							<div class="blog_image" style="background-image:url(images/blog_6.jpg)"></div>
-							<div class="blog_text">In nisl tortor, tempus nec ex vitae, bibendum rutrum mi. Integer tempus nisi</div>
-							<div class="blog_button"><a href="blog_single.html">Continue Reading</a></div>
-						</div>
-
-						<!-- Blog post -->
-						<div class="blog_post">
-							<div class="blog_image" style="background-image:url(images/blog_7.jpg)"></div>
-							<div class="blog_text">Make Life Easier on Yourself by Accepting “Good Enough.” Don’t Pursue Perfection.</div>
-							<div class="blog_button"><a href="blog_single.html">Continue Reading</a></div>
-						</div>
-
-						<!-- Blog post -->
-						<div class="blog_post">
-							<div class="blog_image" style="background-image:url(images/blog_8.jpg)"></div>
-							<div class="blog_text">13 Reasons You Are Failing At Life And Becoming A Bum</div>
-							<div class="blog_button"><a href="blog_single.html">Continue Reading</a></div>
-						</div>
-
-						<!-- Blog post -->
-						<div class="blog_post">
-							<div class="blog_image" style="background-image:url(images/blog_9.jpg)"></div>
-							<div class="blog_text">4 Steps to Getting Anything You Want In Life</div>
-							<div class="blog_button"><a href="blog_single.html">Continue Reading</a></div>
-						</div>
+						{% for blog in blogs %}
+							<!-- Blog post -->
+							<div class="blog_post">
+								{% if blog.image %}
+									<div class="blog_image" style="background-image:url({{ blog.image.url }})"></div>
+								{% endif %}
+								<div class="blog_text">{{ blog.title }}</div>
+								<div class="blog_button"><a href="blog_single.html">Continue Reading</a></div>
+							</div>
+						{% endfor %}
 						
 					</div>
-				</div>
 					
+					<div class="shop_page_nav d-flex flex-row">
+						<ul class="reviews-pages">
+							{% if blogs.has_previous %}
+								<a class="pagination-action" href="?page=1">
+									<i class="fa fa-angle-double-left"></i>
+								</a>
+								<a class="pagination-action" href="?page={{ blogs.previous_page_number }}">
+									<i class="fa fa-angle-left"></i>
+								</a>
+							{% endif %}
+
+							{% for num in blogs.paginator.page_range %}
+								{% if blogs.number == num %}
+									<span class="pagination-number pagination-current">{{ num }}</span>
+								{% elif num > blogs.number|add:'-3' and num < blogs.number|add:'3' %}
+									<a class="pagination-number" href="?page={{ num }}">{{ num }}</a>
+								{% endif %}
+							{% endfor %}
+
+							{% if blogs.has_next %}
+								<a class="pagination-action" href="?page={{ blogs.next_page_number }}"> 
+									<i class="fa fa-angle-right"></i> 
+								</a>
+								<a class="pagination-action" href="?page={{ blogs.paginator.num_pages }}">
+									<i class="fa fa-angle-double-right"></i>
+								</a>
+							{% endif %}
+						</ul>
+					</div>
+
+				</div>
+			
 			</div>
 		</div>
 	</div>
 
 	<!-- Newsletter -->
 
-	<div class="newsletter">
+	{% comment %} <div class="newsletter">
 		<div class="container">
 			<div class="row">
 				<div class="col">
@@ -555,20 +560,20 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 			</div>
 		</div>
 	</div>
-</div>
+</div> {% endcomment %}
 
-<script src="js/jquery-3.3.1.min.js"></script>
-<script src="styles/bootstrap4/popper.js"></script>
-<script src="styles/bootstrap4/bootstrap.min.js"></script>
-<script src="plugins/greensock/TweenMax.min.js"></script>
-<script src="plugins/greensock/TimelineMax.min.js"></script>
-<script src="plugins/scrollmagic/ScrollMagic.min.js"></script>
-<script src="plugins/greensock/animation.gsap.min.js"></script>
-<script src="plugins/greensock/ScrollToPlugin.min.js"></script>
-<script src="plugins/OwlCarousel2-2.2.1/owl.carousel.js"></script>
-<script src="plugins/parallax-js-master/parallax.min.js"></script>
-<script src="plugins/easing/easing.js"></script>
-<script src="js/blog_custom.js"></script>
+<script src="{% static '' %}js/jquery-3.3.1.min.js"></script>
+<script src="{% static '' %}styles/bootstrap4/popper.js"></script>
+<script src="{% static '' %}styles/bootstrap4/bootstrap.min.js"></script>
+<script src="{% static '' %}plugins/greensock/TweenMax.min.js"></script>
+<script src="{% static '' %}plugins/greensock/TimelineMax.min.js"></script>
+<script src="{% static '' %}plugins/scrollmagic/ScrollMagic.min.js"></script>
+<script src="{% static '' %}plugins/greensock/animation.gsap.min.js"></script>
+<script src="{% static '' %}plugins/greensock/ScrollToPlugin.min.js"></script>
+<script src="{% static '' %}plugins/OwlCarousel2-2.2.1/owl.carousel.js"></script>
+<script src="{% static '' %}plugins/parallax-js-master/parallax.min.js"></script>
+<script src="{% static '' %}plugins/easing/easing.js"></script>
+<script src="{% static '' %}js/blog_custom.js"></script>
 </body>
 
 </html>

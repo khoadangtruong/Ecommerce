@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 {% load static %}
+{% load currency %}
 <title>Cart</title>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -42,12 +43,21 @@
 										</ul>
 									</li>
 									<li>
-										<a href="#">$ US dollar<i class="fas fa-chevron-down"></i></a>
-										<ul>
-											<li><a href="#">EUR Euro</a></li>
-											<li><a href="#">GBP British Pound</a></li>
-											<li><a href="#">JPY Japanese Yen</a></li>
-										</ul>
+										<form id="currency_switcher" method="POST" action="{% url 'selectcurrency' %}">
+											{% csrf_token %}
+											<select name="currency" onchange="submit()" >
+												{% for curr in CURRENCIES %}
+													<option value="{{ curr.code }}"
+															{% ifequal curr.code request.session.currency %}selected="selected"{% endifequal %}>
+														{{ curr.symbol }} {{ curr.name }}
+													</option>
+												{% endfor %}
+											</select>
+
+											<noscript>
+												<input type="submit" value="Set" />
+											</noscript>
+										</form>
 									</li>
 									<li>
 										{% if user.id is not None%}
@@ -143,7 +153,7 @@
 										<div class="cart_text"><a href="/shopcart/">Cart</a></div>
 										{% load myapptags %}
 										{% shopcarttotal user.id as total %}
-										<div class="cart_price">${{total}}</div>
+										<div class="cart_price">{{ total|currency:request.session.currency }} {{ request.session.currency }}</div>
 									</div>
 								</div>
 							</div>
@@ -224,7 +234,7 @@
 											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 										</ul>
 									</li> {% endcomment %}
-									<li class="hassubs">
+									{% comment %} <li class="hassubs">
 										<a href="#">Featured Brands<i class="fas fa-chevron-down"></i></a>
 										<ul>
 											<li>
@@ -239,9 +249,10 @@
 											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 										</ul>
-									</li>
+									</li> {% endcomment %}
 									<li><a href="{% url 'shop'%}">Shop<i class="fas fa-chevron-down"></i></a></li>
-									<li><a href="blog.html">Blog<i class="fas fa-chevron-down"></i></a></li>
+									<li><a href="{% url 'blog'%}">Blog<i class="fas fa-chevron-down"></i></a></li>
+									<li><a href="{% url 'faq'%}">Faqs<i class="fas fa-chevron-down"></i></a></li> 
 									<li><a href="{% url 'about'%}">About US<i class="fas fa-chevron-down"></i></a></li>
 									<li><a href="{% url 'contact'%}">Contact<i class="fas fa-chevron-down"></i></a></li>
 								</ul>
@@ -370,21 +381,18 @@
 												<div class="cart_item_title">Name</div>
 												<div class="cart_item_text">{{rs.product}}</div>
 											</div>
-											<div class="cart_item_color cart_info_col">
-												<div class="cart_item_title">Color</div>
-												<div class="cart_item_text"><span style="background-color:#999999;"></span>Silver</div>
-											</div>
 											<div class="cart_item_quantity cart_info_col">	
 												<div class="cart_item_title">Quantity</div>
 												<div class="cart_item_text">{{rs.quantity}}</div>
 											</div>
 											<div class="cart_item_price cart_info_col">
 												<div class="cart_item_title">Price</div>
-												<div class="cart_item_text">${{rs.product.price}}</div>
+												<div class="cart_item_text">${{rs.product.price|currency:request.session.currency}} {{ request.session.currency }}</div>
+												
 											</div>
 											<div class="cart_item_total cart_info_col">
 												<div class="cart_item_title">Total</div>
-												<div class="cart_item_text">${{rs.amount}}</div>
+												<div class="cart_item_text">${{rs.amount|currency:request.session.currency}} {{ request.session.currency }}</div>
 											</div>
 											<a href="/order/deletefromcart/{{ rs.id }}" onclick="return confirm('Delete! Are you sure?')"style="color: white; background-color:red; font-weight: bold; padding: 7px; border: 1px solid red; text-align: center; border-radius: 20px; font-size: 14px; margin-top: 35px; margin-bottom: 38px; margin-right: -20px;" >X</a>
 										</div>
@@ -397,7 +405,7 @@
 						<div class="order_total">
 							<div class="order_total_content text-md-right">
 								<div class="order_total_title">Order Total:</div>
-								<div class="order_total_amount" style="color: red;">${{total}}</div>
+								<div class="order_total_amount" style="color: red;">{{total|currency:request.session.currency}} {{ request.session.currency }}</div>
 							</div>
 						</div>
 

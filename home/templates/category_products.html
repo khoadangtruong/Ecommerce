@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 	{% load static %}
+	{% load currency %}
 	<title>{{ catdata.title }}</title>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -48,12 +49,21 @@
 										</ul>
 									</li>
 									<li>
-										<a href="#">$ US dollar<i class="fas fa-chevron-down"></i></a>
-										<ul>
-											<li><a href="#">EUR Euro</a></li>
-											<li><a href="#">GBP British Pound</a></li>
-											<li><a href="#">JPY Japanese Yen</a></li>
-										</ul>
+										<form id="currency_switcher" method="POST" action="{% url 'selectcurrency' %}">
+											{% csrf_token %}
+											<select name="currency" onchange="submit()" >
+												{% for curr in CURRENCIES %}
+													<option value="{{ curr.code }}"
+															{% ifequal curr.code request.session.currency %}selected="selected"{% endifequal %}>
+														{{ curr.symbol }} {{ curr.name }}
+													</option>
+												{% endfor %}
+											</select>
+
+											<noscript>
+												<input type="submit" value="Set" />
+											</noscript>
+										</form>
 									</li>
 									<li>
 										{% if user.id is not None%}
@@ -160,7 +170,7 @@
 										<div class="cart_text"><a href="/shopcart/">Cart</a></div>
 										{% load myapptags %}
 										{% shopcarttotal user.id as total %}
-										<div class="cart_price">${{total}}</div>
+										<div class="cart_price">{{ total|currency:request.session.currency }} {{ request.session.currency }}</div>
 									</div>
 								</div>
 							</div>
@@ -242,7 +252,7 @@
 										</ul>
 									</li> {% endcomment %}
 									<li><a href="{% url 'shop'%}">Shop<i class="fas fa-chevron-down"></i></a></li>
-									<li><a href="blog.html">Blog<i class="fas fa-chevron-down"></i></a></li>
+									<li><a href="{% url 'blog'%}">Blog<i class="fas fa-chevron-down"></i></a></li> 
 									<li><a href="{% url 'faq'%}">FAQs<i class="fas fa-chevron-down"></i></a></li>
 									<li><a href="{% url 'about'%}">About US<i class="fas fa-chevron-down"></i></a></li>
 									<li><a href="{% url 'contact'%}">Contact<i class="fas fa-chevron-down"></i></a></li>
@@ -450,7 +460,7 @@
 									<div class="product_border"></div>
 									<div class="product_image d-flex flex-column align-items-center justify-content-center"><img src="{{rs.image.url}}" alt=""></div>
 									<div class="product_content">
-										<div class="product_price">${{rs.price}}</div>
+										<div class="product_price">{{rs.price|currency:request.session.currency}} {{request.session.currency}}</div>
 										<div class="product_name"><div><a href="/product/{{ rs.id }}/{{ rs.slug }}" tabindex="0">{{rs.title}}</a></div></div>
 									</div>
 									<div class="product_fav"><i class="fas fa-heart"></i></div>
@@ -528,7 +538,7 @@
 									<div class="viewed_item discount d-flex flex-column align-items-center justify-content-center text-center">
 										<div class="viewed_image"><img src="{{rs.image.url}}" alt=""></div>
 										<div class="viewed_content text-center">
-											<div class="viewed_price">${{rs.price}}</div>
+											<div class="viewed_price">{{rs.price|currency:request.session.currency}} {{request.session.currency}}</div>
 											<div class="viewed_name"><a href="/product/{{ rs.id }}/{{ rs.slug }}">{{rs.title}}</a></div>
 										</div>
 										<ul class="item_marks">

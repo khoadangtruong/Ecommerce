@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 {% load static %}
+{% load currency %}
 <title>Checkout</title>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -48,12 +49,21 @@
 										</ul>
 									</li>
 									<li>
-										<a href="#">$ US dollar<i class="fas fa-chevron-down"></i></a>
-										<ul>
-											<li><a href="#">EUR Euro</a></li>
-											<li><a href="#">GBP British Pound</a></li>
-											<li><a href="#">JPY Japanese Yen</a></li>
-										</ul>
+										<form id="currency_switcher" method="POST" action="{% url 'selectcurrency' %}">
+											{% csrf_token %}
+											<select name="currency" onchange="submit()" >
+												{% for curr in CURRENCIES %}
+													<option value="{{ curr.code }}"
+															{% ifequal curr.code request.session.currency %}selected="selected"{% endifequal %}>
+														{{ curr.symbol }} {{ curr.name }}
+													</option>
+												{% endfor %}
+											</select>
+
+											<noscript>
+												<input type="submit" value="Set" />
+											</noscript>
+										</form>
 									</li>
 									<li>
 										{% if user.id is not None%}
@@ -149,7 +159,7 @@
 										<div class="cart_text"><a href="/shopcart/">Cart</a></div>
 										{% load myapptags %}
 										{% shopcarttotal user.id as total %}
-										<div class="cart_price">${{total}}</div>
+										<div class="cart_price">{{ total|currency:request.session.currency }} {{ request.session.currency }}</div>
 									</div>
 								</div>
 							</div>
@@ -230,7 +240,7 @@
 											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 										</ul>
 									</li> {% endcomment %}
-									<li class="hassubs">
+									{% comment %} <li class="hassubs">
 										<a href="#">Featured Brands<i class="fas fa-chevron-down"></i></a>
 										<ul>
 											<li>
@@ -245,9 +255,10 @@
 											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 											<li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
 										</ul>
-									</li>
+									</li> {% endcomment %}
 									<li><a href="{% url 'shop'%}">Shop<i class="fas fa-chevron-down"></i></a></li>
-									<li><a href="blog.html">Blog<i class="fas fa-chevron-down"></i></a></li>
+									<li><a href="{% url 'blog'%}">Blog<i class="fas fa-chevron-down"></i></a></li> 
+									<li><a href="{% url 'faq'%}">Faqs<i class="fas fa-chevron-down"></i></a></li>
 									<li><a href="{% url 'about'%}">About US<i class="fas fa-chevron-down"></i></a></li>
 									<li><a href="{% url 'contact'%}">Contact<i class="fas fa-chevron-down"></i></a></li>
 								</ul>
@@ -391,7 +402,7 @@
 							</div> {% endcomment %}
 						</div>
 						<hr>
-						<button id="form-button" class="btn btn-success btn-block" type="submit" value="Continue">Continue</button>
+						<button id="form-button" class="btn btn-success btn-block" type="submit" value="Continue">Order</button>
 					</form>
 				</div>
 				<br>
@@ -412,13 +423,12 @@
 						<div class="cart-row">
 							<div style="flex:1.5"><img style="width: 80px;" class="row-image" src="{{ rs.product.image.url }}"></div>
 							<div style="flex:1.5"><p>{{ rs.product }}</p></div>
-							<div style="flex:1"><p>Silver</p></div>
-							<div style="flex:1"><p>${{ rs.product.price }}</p></div>
+							<div style="flex:1"><p>{{rs.product.price|currency:request.session.currency}} {{ request.session.currency }}</p></div>
 							<div style="flex:1"><p>x{{ rs.quantity }}</p></div>
 						</div>
 					{% endfor %}
 					<h5>Items:   {{ count }}</h5>
-					<h5>Total:   ${{ total }}</h5>
+					<h5>Total:   {{ total|currency:request.session.currency }} {{ request.session.currency }}</h5>
 				</div>
 			</div>
 		</div>
