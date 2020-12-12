@@ -54,7 +54,7 @@
 									<li>
 										<form id="currency_switcher" method="POST" action="{% url 'selectcurrency' %}">
 											{% csrf_token %}
-											<select name="currency" onchange="submit()" >
+											<select name="currency" onchange="submit()" style="border-bottom: none; color: black" >
 												{% for curr in CURRENCIES %}
 													<option value="{{ curr.code }}"
 															{% ifequal curr.code request.session.currency %}selected="selected"{% endifequal %}>

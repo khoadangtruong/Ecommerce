@@ -45,7 +45,7 @@
 									<li>
 										<form id="currency_switcher" method="POST" action="{% url 'selectcurrency' %}">
 											{% csrf_token %}
-											<select name="currency" onchange="submit()" >
+											<select name="currency" onchange="submit()" style="border-bottom: none; color: black" >
 												{% for curr in CURRENCIES %}
 													<option value="{{ curr.code }}"
 															{% ifequal curr.code request.session.currency %}selected="selected"{% endifequal %}>
@@ -458,13 +458,15 @@
 							<div class="newsletter_title">Sign up for Newsletter</div>
 							<div class="newsletter_text"><p>...and receive %20 coupon for first shopping.</p></div>
 						</div>
-						<div class="newsletter_content clearfix">
+						{% comment %} <div class="newsletter_content clearfix">
 							<form action="#" class="newsletter_form">
 								<input type="email" class="newsletter_input" required="required" placeholder="Enter your email address">
 								<button class="newsletter_button">Subscribe</button>
 							</form>
 							<div class="newsletter_unsubscribe_link"><a href="#">unsubscribe</a></div>
-						</div>
+						</div> {% endcomment %}
+						<div class="newsletter_unsubscribe_link" style="margin-right: 30px;"><a href="{% url 'newsletter_subscribe' %}">subscribe</a></div>
+						<div class="newsletter_unsubscribe_link"><a href="{% url 'newsletter_unsubscribe' %}">unsubscribe</a></div>
 					</div>
 				</div>
 			</div>
@@ -504,15 +506,9 @@
 					<div class="footer_column">
 						<div class="footer_title">Find it Fast</div>
 						<ul class="footer_list">
-							<li><a href="#">Computers & Laptops</a></li>
-							<li><a href="#">Cameras & Photos</a></li>
-							<li><a href="#">Hardware</a></li>
-							<li><a href="#">Smartphones & Tablets</a></li>
-							<li><a href="#">TV & Audio</a></li>
-						</ul>
-						<div class="footer_subtitle">Gadgets</div>
-						<ul class="footer_list">
-							<li><a href="#">Car Electronics</a></li>
+							{% recursetree category %}
+								<li><a href="/category/{{node.id}}/{{node.slug}}">{{node.title}}</a></li>
+							{% endrecursetree %}
 						</ul>
 					</div>
 				</div>
@@ -533,12 +529,12 @@
 					<div class="footer_column">
 						<div class="footer_title">Customer Care</div>
 						<ul class="footer_list">
-							<li><a href="#">My Account</a></li>
+							<li><a href="/user">My Account</a></li>
 							<li><a href="#">Order Tracking</a></li>
-							<li><a href="#">Wish List</a></li>
+							<li><a href="/user/favorites">Wish List</a></li>
 							<li><a href="#">Customer Services</a></li>
 							<li><a href="#">Returns / Exchange</a></li>
-							<li><a href="#">FAQs</a></li>
+							<li><a href="{% url 'faq' %}">FAQs</a></li>
 							<li><a href="#">Product Support</a></li>
 						</ul>
 					</div>
