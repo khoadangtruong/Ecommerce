@@ -10,7 +10,7 @@ from home.form import SearchForm
 from django.contrib.auth.decorators import login_required
 from user.models import UserProfile
 from Ecommerce import settings
-
+from order.models import ShopCart
 
 
 def index(request):
@@ -37,7 +37,7 @@ def index(request):
 
     popular_products =  Product.objects.all().order_by('num_visits')[1:2]
     popular_products_down =  Product.objects.all().order_by('-num_visits')[10:11]
-    main_popular_products_down =  Product.objects.all().order_by('-num_visits')[:10]
+    main_popular_products_down =  Product.objects.all().order_by('num_visits')[:10]
 
     recently_views_products = Product.objects.all().order_by('-last_visit')[0:20]
 

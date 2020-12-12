@@ -26,9 +26,3 @@ def shopcarttotal(userid):
     total = sum(product.price * product.quantity for product in shopcart)
     return total
 
-@register.simple_tag
-def on_sale(id):
-     product = Product.objects.get(pk = id)
-     if product.on_sale is True:
-        product.price = product.price - (product.price * 0.25)
-        return product.price

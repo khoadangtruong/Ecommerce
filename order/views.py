@@ -1,3 +1,4 @@
+import json
 from django.utils.crypto import get_random_string
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -6,6 +7,8 @@ from product.models import Product
 from order.models import ShopCart, ShopCartForm, OrderForm, Order, OrderProduct
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 def index(request):
@@ -74,6 +77,7 @@ def deletefromcart(request, id):
     messages.success(request, "Your item has been deleted from cart.")
     return HttpResponseRedirect("/shopcart")
 
+@csrf_exempt
 def orderproduct(request):
     
     current_user = request.user
@@ -128,7 +132,6 @@ def orderproduct(request):
     form = OrderForm()
     shopcart = ShopCart.objects.filter(user_id = current_user.id)
     profile = UserProfile.objects.get(user_id = current_user.id)
-
     context = {
         'shopcart': shopcart,
         'total': total,
@@ -136,3 +139,12 @@ def orderproduct(request):
         'profile': profile,
     }
     return render(request, 'order_form.html', context)
+
+def ordercompleted(request):
+    body = json.loads(request.body)
+    print('BODY:', body)
+    product = Product.objects.get(id=body['productId'])
+    OrderProduct.objects.create(
+        product = product
+    )
+    return JsonResponse('Payment Completed!', safe=False)

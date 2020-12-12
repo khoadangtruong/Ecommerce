@@ -18,6 +18,7 @@ class ShopCart(models.Model):
     @property
     def amount(self):
         return (self.quantity * self.product.price)
+            
 
 class ShopCartForm(ModelForm):
     class Meta:
@@ -75,3 +76,5 @@ class OrderProduct(models.Model):
 
     def __str__(self):
         return self.product.title
+    
+    

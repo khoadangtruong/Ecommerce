@@ -20,6 +20,7 @@ from django.conf.urls.static import static
 from home import views
 from order import views as OrderViews
 from user import views as UserViews
+from newsletter import views as NewsletterViews
 
 urlpatterns = [
     path('selectcurrency', views.selectcurrency, name='selectcurrency'),
@@ -36,6 +37,9 @@ urlpatterns = [
     path('blog/',include('blog.urls')),
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('currencies/',include('currencies.urls')),
+    
+    path('subscribe/',NewsletterViews.newsletter_subscribe, name='newsletter_subscribe'),
+    path('unsubscribe/',NewsletterViews.newsletter_unsubscribe, name='newsletter_unsubscribe'),
 
     path('selectcurrency', views.selectcurrency, name='selectcurrency'),
     path('savelangcur', views.savelangcur, name='savelangcur'),
@@ -50,6 +54,7 @@ urlpatterns = [
     
     path('shopcart/',OrderViews.shopcart, name='shopcart'),
     path('order_form/',OrderViews.orderproduct, name='orderproduct'),
+    path('ordercompleted', OrderViews.ordercompleted, name='ordercompleted'),
 
     path('login/',UserViews.login_form, name='login_form'),
     path('logout/',UserViews.logout_func, name='logout_func'),
