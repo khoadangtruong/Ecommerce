@@ -4,11 +4,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from user.models import UserProfile
 from product.models import Product
-from order.models import ShopCart, ShopCartForm, OrderForm, Order, OrderProduct
+from order.models import ShopCart, ShopCartForm, OrderForm, Order, OrderProduct, Payment
 from django.http.response import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.contrib.auth.models import User
 
 # Create your views here.
 def index(request):
@@ -77,9 +78,25 @@ def deletefromcart(request, id):
     messages.success(request, "Your item has been deleted from cart.")
     return HttpResponseRedirect("/shopcart")
 
-@csrf_exempt
+
+def payment_complete(request):
+    body = json.loads(request.body)
+    order = Order.objects.get(user=request.user, id=body['orderID'])
+    payment = Payment(
+        user=request.user,
+        charge_id=body['payID'],
+        amount=order.total
+    )
+    payment.save()
+
+    # assign the payment to order
+    order.payment = payment
+    order.save()
+    messages.success(request, "Payment was successful")
+    return redirect('home')
+
+
 def orderproduct(request):
-    
     current_user = request.user
     shopcart = ShopCart.objects.filter(user_id = current_user.id)
     total = 0
@@ -87,10 +104,9 @@ def orderproduct(request):
     for rs in shopcart:
         total += rs.product.price * rs.quantity
         count += rs.quantity 
-    
+
     if request.method == 'POST':
         form = OrderForm(request.POST)
-
         if form.is_valid():
             data = Order()
             data.first_name = form.cleaned_data['first_name']
@@ -105,7 +121,6 @@ def orderproduct(request):
             data.code = ordercode
             data.save()
 
-            shopcart = ShopCart.objects.filter(user_id = current_user.id)
             for rs in shopcart:
                 detail = OrderProduct()
                 detail.order_id = data.id
@@ -119,32 +134,31 @@ def orderproduct(request):
                 product = Product.objects.get(id=rs.product_id)
                 product.amount -= rs.quantity
                 product.save()
+            
+            # if payment_option == "S":
+            #     return redirect('payment', payment_option="stripe")
+
+            # if payment_option == "P":
+            #     return redirect('payment', payment_option="paypal")
+            # messages.info(self.request, "Invalid payment option")
+            # return redirect('checkout')
 
             ShopCart.objects.filter(user_id=current_user.id).delete()
             request.session['cart_item'] = 0 
             messages.success(request, 'Your order has been completed.')
-            return render(request, 'Order_Completed.html', {'ordercode': ordercode,  'count': count, 'total': total})
+            return render(request, 'Order_Completed.html', {'ordercode': ordercode})
         
         else:
             messages.warning(request, form.errors)
             return HttpResponseRedirect('/order/orderproduct')
 
     form = OrderForm()
-    shopcart = ShopCart.objects.filter(user_id = current_user.id)
-    profile = UserProfile.objects.get(user_id = current_user.id)
+    # profile = UserProfile.objects.get(user_id = current_user.id)
     context = {
         'shopcart': shopcart,
         'total': total,
         'form': form,
-        'profile': profile,
+        # 'profile': profile,
     }
     return render(request, 'order_form.html', context)
 
-def ordercompleted(request):
-    body = json.loads(request.body)
-    print('BODY:', body)
-    product = Product.objects.get(id=body['productId'])
-    OrderProduct.objects.create(
-        product = product
-    )
-    return JsonResponse('Payment Completed!', safe=False)

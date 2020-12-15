@@ -67,7 +67,7 @@
 									</li>
 									<li>
 										{% if user.id is not None%}
-											<a class="user_icon"><img src="{{ request.session.userimage }}" style="height: 28px; width: 30px; border-radius: 30%;" alt="">Hello, {{ user.first_name }}</a>
+											<a class="user_icon"><img src="{{ user.userprofile.image.url }}" style="height: 28px; width: 30px; border-radius: 30%;" alt="">Hello, {{ user.first_name }}</a>
 												<ul>
 													<li><a href="/user">User profile</a></li>
 													<li><a href="/logout">Logout</a></li>
@@ -402,86 +402,82 @@
 							</div> {% endcomment %}
 						</div>
 						<hr>
-						<button id="form-button" class="btn btn-success btn-block" style="width: 99%" type="submit" value="Continue">Submit Payment</button>
+						<button id="form-button" class="btn btn-success btn-block" style="width: 99%" type="submit">Submit </button>
 
 						<div id="paypal-button-container" style="margin-top: 20px; width: 100%"></div>
-
-						<!-- Include the PayPal JavaScript SDK -->
-						<script src="https://www.paypal.com/sdk/js?client-id=Ac0JzE2C2gleebo98WHQI7V4QE3O_Fns0HEjnFPe0-_sNljwKvcadlNO90qK-27KIF6K_SXocXehmRrA&currency=USD"></script>
-
-						<script>
-
-							function getCookie(name) {
-								var cookieValue = null;
-								if (document.cookie && document.cookie !== '') {
-									var cookies = document.cookie.split(';');
-									for (var i = 0; i < cookies.length; i++) {
-										var cookie = cookies[i].trim();
-										// Does this cookie string begin with the name we want?
-										if (cookie.substring(0, name.length + 1) === (name + '=')) {
-											cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-											break;
-										}
-									}
-								}
-								return cookieValue;
-							}
-							var csrftoken = getCookie('csrftoken'); 
-
-							var total = '{{total|currency:request.session.currency }} {{ request.session.currency }}'
-							var shopcartId = '{{ shopcart.id }}'
-
-							function completedOrder(){
-								var url = "{% url 'orderproduct' %}"
-
-								fetch(url, {
-									method: 'POST',
-									header: {
-										'Content-Type': 'application/json',
-										'X-CSRFToken': csrftoken,
-									},
-									body:JSON.stringify({'shopcartId':shopcartId})
-								})
-							}
-
-							// Render the PayPal button into #paypal-button-container
-							paypal.Buttons({
-								
-								style: {
-									color:  'blue',
-									shape:  'pill',
-									label:  'pay',
-									height: 40,
-								},
-
-								// Set up the transaction
-								createOrder: function(data, actions) {
-									return actions.order.create({
-										purchase_units: [{
-											amount: {
-												value: parseFloat(total).toFixed(2),
-											}
-										}]
-									});
-								},
-
-								// Finalize the transaction
-								onApprove: function(data, actions) {
-									return actions.order.capture().then(function(details) {
-										completedOrder()
-										// Show a success message to the buyer
-										alert('Transaction completed by ' + details.payer.name.given_name + '!');
-									});
-								},
-
-							}).render('#paypal-button-container');
-						</script>
-
-						
 					</form>
 				</div>
-				<br>
 
+				
+				<!-- Include the PayPal JavaScript SDK -->
+				<script src="https://www.paypal.com/sdk/js?client-id=Ac0JzE2C2gleebo98WHQI7V4QE3O_Fns0HEjnFPe0-_sNljwKvcadlNO90qK-27KIF6K_SXocXehmRrA&currency=USD"></script>
+				
+				<script>
+					function getCookie(name) {
+						var cookieValue = null;
+						if (document.cookie && document.cookie !== '') {
+							var cookies = document.cookie.split(';');
+							for (var i = 0; i < cookies.length; i++) {
+								var cookie = cookies[i].trim();
+								// Does this cookie string begin with the name we want?
+								if (cookie.substring(0, name.length + 1) === (name + '=')) {
+									cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+									break;
+								}
+							}
+						}
+						return cookieValue;
+					}
+					var csrftoken = getCookie('csrftoken'); 
+					var total = '{{total|currency:request.session.currency }} {{ request.session.currency }}';
+					var orderID = '{{ order.id }}';
+					var url = "{% url 'payment_complete' %}";
+					// Render the PayPal button into #paypal-button-container
+					paypal.Buttons({
+						style: {
+							color:  'blue',
+							shape:  'pill',
+							label:  'pay',
+							height: 40,
+						},
+						// Set up the transaction
+						createOrder: function (data, actions) {
+							return actions.order.create({
+							purchase_units: [
+								{
+									amount: {
+										value: parseFloat(total).toFixed(2),
+									},
+								},
+							],
+							});
+						},
+						
+						// Finalize the transaction
+						onApprove: function(data, actions) {
+							return actions.order.capture().then(function(details) {
+								console.log(details)
+								sendData()
+								function sendData(){
+									fetch(url, {
+										method: 'POST',
+										header: {
+											'Content-Type': 'application/json',
+											'X-CSRFToken': csrftoken,
+										},
+										body: JSON.stringify({ 'orderID': orderID, 'payID': details.id }),
+									})
+								}
+								// Show a success message to the buyer
+								
+								alert('Transaction completed by ' + details.payer.name.given_name + '!');
+							});
+						},
+					}).render('#paypal-button-container');
+
+				</script>
+				
+				<br>
 			</div>
 
 			<div class="col-lg-6" style="margin-top: 60px;">
@@ -505,297 +501,17 @@
 		</div>
 	</div>
 
-	{% comment %} <div class="cart_section">
-		<div class="container">
-			<div class="row">
-                <form action="" method="POST" >
-                    {% csrf_token %}
-                    <div class="col-md-6" style="float: left;">
-						<div class="billing-details">
-							<div class="section-title">
-								<h3 class="title">Billing Details</h3>
-							</div>
-							<div class="form-group">
-                                <label for="id_first_name">First name:</label>
-								<input class="input" type="text" name="first_name" value="{{ user.first_name }}" class="input" maxlength="10" required id="id_first_name">
-							</div>
-							<div class="form-group">
-                                <label for="id_first_name">Last name:</label>
-								<input class="input" type="text" name="last_name" value="{{ user.last_name }}" class="input" maxlength="10" required id="id_last_name">
-							</div>
-							<div class="form-group">
-                                <label for="id_first_name">Address:</label>
-								<input class="input" type="text" name="address" value="{{ profile.address }}" class="input" maxlength="150" id="id_address" placeholder="address">
-							</div>
-							<div class="form-group">
-                                <label for="id_first_name">City:</label>
-								<input class="input" type="text" name="city" value="{{ profile.city }}" class="input" maxlength="150" id="id_city" placeholder="city">
-							</div>
-							<div class="form-group">
-                                <label for="id_first_name">Country:</label>
-								<input class="input" type="text" name="country" id="id_country" value="{{ profile.country }}" placeholder="country">
-							</div>
-							<div class="form-group">
-                                <label for="id_first_name">Phone:</label>
-								<input class="input" type="tel" name="tel" value="{{ profile.phone }}" class="input" maxlength="20" id="id_phone" placeholder="phone">
-							</div>
-						</div>
-					</div>
 
-					<div class="col-md-6" style="float: left;">
-						<div class="shiping-methods">
-							<div class="section-title">
-								<h4 class="title">Payment Information</h4>
-							</div>
-							<div class="form-group">
-                                <label for="id_first_name">Total:</label>
-								<input class="input" type="tel" name="total" value="${{ total }}" class="input" >
-							</div>
-                            <div class="form-group">
-                                <label for="id_first_name">Credit Card Holder:</label>
-								<input class="input" type="tel" name="holder" value="" class="input" >
-							</div>
-                            <div class="form-group">
-                                <label for="id_first_name">Credit Card Number:</label>
-								<input class="input" type="tel" name="number" value="" class="input" >
-							</div>
-                            <div class="form-group">
-                                <label for="id_first_name">Credit Exp Date/Year:</label>
-								<input class="input" type="tel" name="ecpdate" value="" class="input" placeholder="mm/yy">
-							</div>
-                            <div class="form-group">
-                                <label for="id_first_name">Security Number:</label>
-								<input class="input" type="tel" name="senumber" value="" class="input" >
-							</div>
-						</div>  
-
-						<div class="payments-methods">
-							<div class="section-title">
-								<h4 class="title">Payments Methods</h4>
-							</div>
-							<div class="input-checkbox">
-								<input type="radio" name="payments" id="payments-1" checked>
-								<label for="payments-1">Direct Bank Transfer</label>
-								<div class="caption">
-									<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-										<p>
-								</div>
-							</div>
-							<div class="input-checkbox">
-								<input type="radio" name="payments" id="payments-2">
-								<label for="payments-2">Cheque Payment</label>
-								<div class="caption">
-									<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-										<p>
-								</div>
-							</div>
-							<div class="input-checkbox">
-								<input type="radio" name="payments" id="payments-3">
-								<label for="payments-3">Paypal System</label>
-								<div class="caption">
-									<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-										<p>
-								</div>
-							</div>
-						</div>
-						
-					</div> 
-
-					
-
-					<div class="col-lg-10 offset-lg-1">
-						<div class="cart_container">
-							<div class="cart_title" style="margin: 50px 0 -20px 0;">Product Ordered</div>
-							{% for rs in shopcart %}
-								<div class="cart_items">
-									<ul class="cart_list">
-										<li class="cart_item clearfix">
-											<div class="cart_item_image"><img src="{{ rs.product.image.url }}" alt=""></div>
-											<div class="cart_item_info d-flex flex-md-row flex-column justify-content-between">
-												<div class="cart_item_name cart_info_col">
-													<div class="cart_item_title">Name</div>
-													<div class="cart_item_text">{{rs.product}}</div>
-												</div>
-												<div class="cart_item_color cart_info_col">
-													<div class="cart_item_title">Color</div>
-													<div class="cart_item_text"><span style="background-color:#999999;"></span>Silver</div>
-												</div>
-												<div class="cart_item_quantity cart_info_col">
-													<div class="cart_item_title">Quantity</div>
-													<div class="cart_item_text">{{rs.quantity}}</div>
-												</div>
-												<div class="cart_item_price cart_info_col">
-													<div class="cart_item_title">Price</div>
-													<div class="cart_item_text">${{rs.product.price}}</div>
-												</div>
-												<div class="cart_item_total cart_info_col">
-													<div class="cart_item_title">Total</div>
-													<div class="cart_item_text">${{rs.amount}}</div>
-												</div>
-												<a href="/order/deletefromcart/{{ rs.id }}" onclick="return confirm('Delete! Are you sure?')"style="color: white; background-color:red; font-weight: bold; padding: 7px; border: 1px solid red; text-align: center; border-radius: 20px; font-size: 14px; margin-top: 35px; margin-bottom: 38px; margin-right: -20px;" >X</a>
-											</div>
-										</li>
-									</ul>
-								</div>
-							{% endfor  %}
-
-							<!-- Order Total -->
-							<div class="order_total">
-								<div class="order_total_content text-md-right">
-									<div class="order_total_title">Order Total:</div>
-									<div class="order_total_amount" style="color: red;">${{total}}</div>
-								</div>
-							</div>
-
-							<div class="cart_buttons">
-								<button type="submit" class="button cart_button_checkout">Complete Order</button>
-							</div>
-						</div>
-					</div>
-                </form>
-			</div>
-		</div>
-	</div> {% endcomment %}
-
-	<!-- Newsletter -->
-
-	{% comment %} <div class="newsletter">
-		<div class="container">
-			<div class="row">
-				<div class="col">
-					<div class="newsletter_container d-flex flex-lg-row flex-column align-items-lg-center align-items-center justify-content-lg-start justify-content-center">
-						<div class="newsletter_title_container">
-							<div class="newsletter_icon"><img src="{% static '' %}images/send.png" alt=""></div>
-							<div class="newsletter_title">Sign up for Newsletter</div>
-							<div class="newsletter_text"><p>...and receive %20 coupon for first shopping.</p></div>
-						</div>
-						<div class="newsletter_content clearfix">
-							<form action="#" class="newsletter_form">
-								<input type="email" class="newsletter_input" required="required" placeholder="Enter your email address">
-								<button class="newsletter_button">Subscribe</button>
-							</form>
-							<div class="newsletter_unsubscribe_link"><a href="#">unsubscribe</a></div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div> {% endcomment %}
-
-	<!-- Footer -->
-
-	{% comment %} <footer class="footer">
-		<div class="container">
-			<div class="row">
-
-				<div class="col-lg-3 footer_col">
-					<div class="footer_column footer_contact">
-						<div class="logo_container">
-							<div class="logo"><a href="{% url 'home' %}">OneTech</a></div>
-						</div>
-						<div class="footer_title">Got Question? Call Us 24/7</div>
-						<div class="footer_phone">+38 068 005 3570</div>
-						<div class="footer_contact_text">
-							<p>17 Princess Road, London</p>
-							<p>Grester London NW18JR, UK</p>
-						</div>
-						<div class="footer_social">
-							<ul>
-								<li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-								<li><a href="#"><i class="fab fa-twitter"></i></a></li>
-								<li><a href="#"><i class="fab fa-youtube"></i></a></li>
-								<li><a href="#"><i class="fab fa-google"></i></a></li>
-								<li><a href="#"><i class="fab fa-vimeo-v"></i></a></li>
-							</ul>
-						</div>
-					</div>
-				</div>
-
-				<div class="col-lg-2 offset-lg-2">
-					<div class="footer_column">
-						<div class="footer_title">Find it Fast</div>
-						<ul class="footer_list">
-							<li><a href="#">Computers & Laptops</a></li>
-							<li><a href="#">Cameras & Photos</a></li>
-							<li><a href="#">Hardware</a></li>
-							<li><a href="#">Smartphones & Tablets</a></li>
-							<li><a href="#">TV & Audio</a></li>
-						</ul>
-						<div class="footer_subtitle">Gadgets</div>
-						<ul class="footer_list">
-							<li><a href="#">Car Electronics</a></li>
-						</ul>
-					</div>
-				</div>
-
-				<div class="col-lg-2">
-					<div class="footer_column">
-						<ul class="footer_list footer_list_2">
-							<li><a href="#">Video Games & Consoles</a></li>
-							<li><a href="#">Accessories</a></li>
-							<li><a href="#">Cameras & Photos</a></li>
-							<li><a href="#">Hardware</a></li>
-							<li><a href="#">Computers & Laptops</a></li>
-						</ul>
-					</div>
-				</div>
-
-				<div class="col-lg-2">
-					<div class="footer_column">
-						<div class="footer_title">Customer Care</div>
-						<ul class="footer_list">
-							<li><a href="#">My Account</a></li>
-							<li><a href="#">Order Tracking</a></li>
-							<li><a href="#">Wish List</a></li>
-							<li><a href="#">Customer Services</a></li>
-							<li><a href="#">Returns / Exchange</a></li>
-							<li><a href="#">FAQs</a></li>
-							<li><a href="#">Product Support</a></li>
-						</ul>
-					</div>
-				</div>
-
-			</div>
-		</div>
-	</footer> {% endcomment %}
-
-	<!-- Copyright -->
-
-	{% comment %} <div class="copyright">
-		<div class="container">
-			<div class="row">
-				<div class="col">
-					
-					<div class="copyright_container d-flex flex-sm-row flex-column align-items-center justify-content-start">
-						<div class="copyright_content"><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-</div> {% endcomment %}
-						{% comment %} <div class="logos ml-sm-auto">
-							<ul class="logos_list">
-								<li><a href="#"><img src="{% static '' %}images/logos_1.png" alt=""></a></li>
-								<li><a href="#"><img src="{% static '' %}images/logos_2.png" alt=""></a></li>
-								<li><a href="#"><img src="{% static '' %}images/logos_3.png" alt=""></a></li>
-								<li><a href="#"><img src="{% static '' %}images/logos_4.png" alt=""></a></li>
-							</ul>
-						</div> {% endcomment %}
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-
-{% comment %} <script src="{% static '' %}js/jquery-3.3.1.min.js"></script>
-<script src="{% static '' %}styles/bootstrap4/popper.js"></script>
-<script src="{% static '' %}styles/bootstrap4/bootstrap.min.js"></script>
-<script src="{% static '' %}plugins/greensock/TweenMax.min.js"></script>
-<script src="{% static '' %}plugins/greensock/TimelineMax.min.js"></script>
-<script src="{% static '' %}plugins/scrollmagic/ScrollMagic.min.js"></script>
-<script src="{% static '' %}plugins/greensock/animation.gsap.min.js"></script>
-<script src="{% static '' %}plugins/greensock/ScrollToPlugin.min.js"></script>
-<script src="{% static '' %}plugins/easing/easing.js"></script>
-<script src="{% static '' %}js/cart_custom.js"></script> {% endcomment %}
+	<script src="{% static '' %}js/jquery-3.3.1.min.js"></script>
+	<script src="{% static '' %}styles/bootstrap4/popper.js"></script>
+	<script src="{% static '' %}styles/bootstrap4/bootstrap.min.js"></script>
+	<script src="{% static '' %}plugins/greensock/TweenMax.min.js"></script>
+	<script src="{% static '' %}plugins/greensock/TimelineMax.min.js"></script>
+	<script src="{% static '' %}plugins/scrollmagic/ScrollMagic.min.js"></script>
+	<script src="{% static '' %}plugins/greensock/animation.gsap.min.js"></script>
+	<script src="{% static '' %}plugins/greensock/ScrollToPlugin.min.js"></script>
+	<script src="{% static '' %}plugins/easing/easing.js"></script>
+	<script src="{% static '' %}js/cart_custom.js"></script>
 
 </body>
 

@@ -136,6 +136,7 @@ def shop(request):
         'all_products': all_products,
         'recently_views_products': recently_views_products,
         'popular_products': popular_products,
+        
     }
     return render(request, 'shop.html', context)
 

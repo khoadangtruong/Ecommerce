@@ -1,22 +1,27 @@
-from order.models import ShopCart, Order, OrderProduct
+from order.models import Order, OrderProduct
 from django.contrib.auth.forms import PasswordChangeForm
 from user.form import RegisterForm, ProfileUpdateForm, UserUpdateForm
 from user.models import UserProfile
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from product.models import Category, Comment
-from django.http.response import HttpResponse, HttpResponseRedirect
+from product.models import Comment
+from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
+from django.dispatch import receiver
+from allauth.account.signals import user_signed_up
 
 # Create your views here.
 @login_required(login_url='/login')
 def index(request):
+    
     current_user = request.user
     profile = UserProfile.objects.get(user_id = current_user.id)
     context = {
         'profile': profile,
     }
+    
+
     return render(request, 'user_profile.html', context)
 
 def login_form(request):
@@ -29,7 +34,6 @@ def login_form(request):
             current_user = request.user
             userprofile = UserProfile.objects.get(user_id = current_user.id)
             request.session['userimage'] = userprofile.image.url
-
             return HttpResponseRedirect('/')
         else:
             messages.warning(request, 'Error! Username or password is incorrect')

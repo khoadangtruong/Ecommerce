@@ -38,9 +38,6 @@ urlpatterns = [
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('currencies/',include('currencies.urls')),
     
-    path('subscribe/',NewsletterViews.newsletter_subscribe, name='newsletter_subscribe'),
-    path('unsubscribe/',NewsletterViews.newsletter_unsubscribe, name='newsletter_unsubscribe'),
-
     path('selectcurrency', views.selectcurrency, name='selectcurrency'),
     path('savelangcur', views.savelangcur, name='savelangcur'),
 
@@ -52,14 +49,19 @@ urlpatterns = [
     path('category/<int:id>/<slug:slug>', views.category_products, name = 'category_products'),
     path('product/<int:id>/<slug:slug>', views.product_page, name = 'product_page'),
     
+    path('subscribe/',NewsletterViews.newsletter_subscribe, name='newsletter_subscribe'),
+    path('unsubscribe/',NewsletterViews.newsletter_unsubscribe, name='newsletter_unsubscribe'),
+
     path('shopcart/',OrderViews.shopcart, name='shopcart'),
     path('order_form/',OrderViews.orderproduct, name='orderproduct'),
-    path('ordercompleted', OrderViews.ordercompleted, name='ordercompleted'),
+    path('payment-complete', OrderViews.payment_complete, name="payment_complete"),
 
+    path('accounts/', include('allauth.urls')),
     path('login/',UserViews.login_form, name='login_form'),
     path('logout/',UserViews.logout_func, name='logout_func'),
     path('register/',UserViews.register_form, name='register_form'),
 
+    
 ]
 
 if settings.DEBUG:

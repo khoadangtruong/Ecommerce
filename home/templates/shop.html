@@ -68,7 +68,7 @@
 									</li>
 									<li>
 										{% if user.id is not None%}
-											<a class="user_icon"><img src="{{ request.session.userimage }}" style="height: 28px; width: 30px; border-radius: 30%;" alt="">Hello, {{ user.first_name }}</a>
+											<a class="user_icon"><img src="{{ user.userprofile.image.url }}" style="height: 28px; width: 30px; border-radius: 30%;" alt="">Hello, {{ user.first_name }}</a>
 												<ul>
 													<li><a href="/user">User profile</a></li>
 													<li><a href="/logout">Logout</a></li>

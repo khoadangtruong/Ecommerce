@@ -1,4 +1,4 @@
-from order.models import ShopCart, Order, OrderProduct
+from order.models import ShopCart, Order, OrderProduct, Payment
 from django.contrib import admin
 
 class ShopCartAdmin(admin.ModelAdmin):
@@ -12,7 +12,7 @@ class OrderProductline(admin.TabularInline):
     extra = 0
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['first_name', 'last_name', 'phone', 'city', 'total', 'status']
+    list_display = ['id', 'first_name', 'last_name', 'phone', 'city', 'total', 'status']
     list_filter = ['status']
     readonly_fields = ('user', 'address', 'city', 'country', 'phone', 'first_name', 'ip', 'last_name', 'total')
     can_delete = False
@@ -25,3 +25,4 @@ class OrderProductAdmin(admin.ModelAdmin):
 admin.site.register(ShopCart, ShopCartAdmin)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderProduct, OrderProductAdmin)
+admin.site.register(Payment)

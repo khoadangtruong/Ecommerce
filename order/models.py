@@ -49,6 +49,7 @@ class Order(models.Model):
     adminnote = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    payment = models.ForeignKey("Payment", on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.user.first_name
@@ -76,5 +77,11 @@ class OrderProduct(models.Model):
 
     def __str__(self):
         return self.product.title
-    
-    
+
+class Payment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    charge_id = models.CharField(max_length=100)
+    amount = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.user.username
