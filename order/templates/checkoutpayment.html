@@ -3,7 +3,7 @@
 <head>
 {% load static %}
 {% load currency %}
-<title>Cart</title>
+<title>Checkout</title>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="description" content="OneTech shop project">
@@ -12,6 +12,12 @@
 <link href="{% static '' %}plugins/fontawesome-free-5.0.1/css/fontawesome-all.css" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="{% static '' %}styles/cart_styles.css">
 <link rel="stylesheet" type="text/css" href="{% static '' %}styles/cart_responsive.css">
+<link rel="stylesheet" type="text/css" href="{% static '' %}styles/order_form.css">
+
+<link type="text/css" rel="stylesheet" href="{% static '' %}styles/slick.css" />
+<link type="text/css" rel="stylesheet" href="{% static '' %}styles/slick-theme.css" />
+<link type="text/css" rel="stylesheet" href="{% static '' %}styles/nouislider.min.css" />
+<link type="text/css" rel="stylesheet" href="{% static '' %}styles/style.css" />
 
 </head>
 
@@ -45,7 +51,7 @@
 									<li>
 										<form id="currency_switcher" method="POST" action="{% url 'selectcurrency' %}">
 											{% csrf_token %}
-											<select name="currency" onchange="submit()" style="border-bottom: none; color: black" >
+											<select name="currency" onchange="submit()" style="border-bottom: none; color: black">
 												{% for curr in CURRENCIES %}
 													<option value="{{ curr.code }}"
 															{% ifequal curr.code request.session.currency %}selected="selected"{% endifequal %}>
@@ -135,7 +141,7 @@
 							<div class="wishlist d-flex flex-row align-items-center justify-content-end">
 								<div class="wishlist_icon"><img src="{% static '' %}images/heart.png" alt=""></div>
 								<div class="wishlist_content">
-									<div class="wishlist_text"><a href="/user/favorites">Wishlist</a></div>
+									<div class="wishlist_text"><a href="#">Wishlist</a></div>
 									<div class="wishlist_count">115</div>
 								</div>
 							</div>
@@ -251,8 +257,8 @@
 										</ul>
 									</li> {% endcomment %}
 									<li><a href="{% url 'shop'%}">Shop<i class="fas fa-chevron-down"></i></a></li>
-									<li><a href="{% url 'blog'%}">Blog<i class="fas fa-chevron-down"></i></a></li>
-									<li><a href="{% url 'faq'%}">Faqs<i class="fas fa-chevron-down"></i></a></li> 
+									<li><a href="{% url 'blog'%}">Blog<i class="fas fa-chevron-down"></i></a></li> 
+									<li><a href="{% url 'faq'%}">Faqs<i class="fas fa-chevron-down"></i></a></li>
 									<li><a href="{% url 'about'%}">About US<i class="fas fa-chevron-down"></i></a></li>
 									<li><a href="{% url 'contact'%}">Contact<i class="fas fa-chevron-down"></i></a></li>
 								</ul>
@@ -360,206 +366,90 @@
 				</div>
 			</div>
 		</div>
-
 	</header>
 
 	<!-- Cart -->
+	<div class="checkout-info" >
+		<div class="row">
+			<div class="col-lg-6" style="margin-top: 60px;">
+				<div class="box-element" id="form-wrapper">
+					<form id="form" method="post">
+						{% csrf_token %}
+						<div id="user-info">
+							<div class="form-field">
+								<input required class="form-control" type="text" value="{{ user.first_name }}" name="first_name" placeholder="First Name..">
+							</div>
+							<div class="form-field">
+								<input required class="form-control" type="text" value="{{ user.last_name }}" name="last_name" placeholder="Last Name..">
+							</div>
+						</div>
+						
+						<div id="shipping-info">
+							<hr>
+							<p>Shipping Information:</p>
+							<hr>
+							<div class="form-field">
+								<input class="form-control" type="text" value="{{ profile.address }}" name="address" placeholder="Address..">
+							</div>
+							<div class="form-field">
+								<input class="form-control" type="text" value="{{ profile.city }}" name="city" placeholder="City..">
+							</div>
+							<div class="form-field">
+								<input class="form-control" type="tel" value="{{ profile.phone }}" name="phone" placeholder="Phone..">
+							</div>
+						</div>
+						<hr>
+						
+						<div class="custom-control custom-radio">
+							<input id="stripe" value="S" name="payment_option" type="radio">
+							<label class="custom-control-label" for="stripe">Stripe</label>
+						</div>
+						<div class="custom-control custom-radio">
+							<input id="paypal" value="P" name="payment_option" type="radio">
+							<label class="custom-control-label" for="paypal">Paypal</label>
+						</div>
+						<button id="form-button" class="btn btn-success btn-block" style="width: 99%" type="submit">Countinue </button>
+					</form>
+				</div>
 
-	<div class="cart_section">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-10 offset-lg-1">
-					<div class="cart_container">
-						<div class="cart_title">Shopping Cart</div>
+				
+				
+				<br>
+			</div>
+
+			<div class="col-lg-6" style="margin-top: 60px;">
+				<div class="box-element">
+					{% comment %} <a class="btn btn-outline-dark" href="/shopcart/">Back to cart</a> {% endcomment %}
+					{% comment %} <hr> {% endcomment %}
+					<h3>Order Summary</h3>
+					<hr>
 						{% for rs in shopcart %}
-							<div class="cart_items" style="text-align: center;">
-								<ul class="cart_list">
-									<li class="cart_item clearfix">
-										<div class="cart_item_image"><img src="{{ rs.product.image.url }}" alt=""></div>
-										<div class="cart_item_info d-flex flex-md-row flex-column justify-content-between">
-											<div class="cart_item_name cart_info_col">
-												<div class="cart_item_title">Name</div>
-												<div class="cart_item_text">{{rs.product}}</div>
-											</div>
-											<div class="cart_item_quantity cart_info_col">	
-												<div class="cart_item_title">Quantity</div>
-												<div class="cart_item_text">{{rs.quantity}}</div>
-											</div>
-											<div class="cart_item_price cart_info_col">
-												<div class="cart_item_title">Price</div>
-												<div class="cart_item_text">${{rs.product.price|currency:request.session.currency}} {{ request.session.currency }}</div>
-												
-											</div>
-											<div class="cart_item_total cart_info_col">
-												<div class="cart_item_title">Total</div>
-												<div class="cart_item_text">${{rs.amount|currency:request.session.currency}} {{ request.session.currency }}</div>
-											</div>
-											<a href="/order/deletefromcart/{{ rs.id }}" onclick="return confirm('Delete! Are you sure?')"style="color: white; background-color:red; font-weight: bold; padding: 7px; border: 1px solid red; text-align: center; border-radius: 20px; font-size: 14px; margin-top: 35px; margin-bottom: 38px; margin-right: -20px;" >X</a>
-										</div>
-									</li>
-								</ul>
+							<div class="cart-row">
+								<div style="flex:1.5"><img style="width: 80px;" class="row-image" src="{{ rs.product.image.url }}"></div>
+								<div style="flex:1.5"><p>{{ rs.product }}</p></div>
+								<div style="flex:1"><p>{{rs.product.price|currency:request.session.currency}} {{ request.session.currency }}</p></div>
+								<div style="flex:1"><p>x{{ rs.quantity }}</p></div>
 							</div>
-						{% endfor  %}
-
-						<!-- Order Total -->
-						<div class="order_total">
-							<div class="order_total_content text-md-right">
-								<div class="order_total_title">Order Total:</div>
-								<div class="order_total_amount" style="color: red;">{{total|currency:request.session.currency}} {{ request.session.currency }}</div>
-							</div>
-						</div>
-
-						<div class="cart_buttons">
-							{% comment %} <button type="button" class="button cart_button_clear">Clear</button> {% endcomment %}
-							<a href="{% url 'shop'%}" class="button cart_button_checkout">Countinue Shopping</a>
-							<a href="/order/orderproduct" class="button cart_button_checkout">Checkout</a>
-							<a href="/checkout" class="button cart_button_checkout">Payment</a>
-						</div>
-					</div>
+					{% endfor %}
+					<h5>Items:   {{ count }}</h5>
+					<h5>Total:   {{ total|currency:request.session.currency }} {{ request.session.currency }}</h5>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<!-- Newsletter -->
 
-	{% comment %} <div class="newsletter">
-		<div class="container">
-			<div class="row">
-				<div class="col">
-					<div class="newsletter_container d-flex flex-lg-row flex-column align-items-lg-center align-items-center justify-content-lg-start justify-content-center">
-						<div class="newsletter_title_container">
-							<div class="newsletter_icon"><img src="{% static '' %}images/send.png" alt=""></div>
-							<div class="newsletter_title">Sign up for Newsletter</div>
-							<div class="newsletter_text"><p>...and receive %20 coupon for first shopping.</p></div>
-						</div>
-						<div class="newsletter_content clearfix">
-							<form action="#" class="newsletter_form">
-								<input type="email" class="newsletter_input" required="required" placeholder="Enter your email address">
-								<button class="newsletter_button">Subscribe</button>
-							</form>
-							<div class="newsletter_unsubscribe_link"><a href="#">unsubscribe</a></div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+	<script src="{% static '' %}js/jquery-3.3.1.min.js"></script>
+	<script src="{% static '' %}styles/bootstrap4/popper.js"></script>
+	<script src="{% static '' %}styles/bootstrap4/bootstrap.min.js"></script>
+	<script src="{% static '' %}plugins/greensock/TweenMax.min.js"></script>
+	<script src="{% static '' %}plugins/greensock/TimelineMax.min.js"></script>
+	<script src="{% static '' %}plugins/scrollmagic/ScrollMagic.min.js"></script>
+	<script src="{% static '' %}plugins/greensock/animation.gsap.min.js"></script>
+	<script src="{% static '' %}plugins/greensock/ScrollToPlugin.min.js"></script>
+	<script src="{% static '' %}plugins/easing/easing.js"></script>
+	<script src="{% static '' %}js/cart_custom.js"></script>
 
-	<!-- Footer -->
-
-	<footer class="footer">
-		<div class="container">
-			<div class="row">
-
-				<div class="col-lg-3 footer_col">
-					<div class="footer_column footer_contact">
-						<div class="logo_container">
-							<div class="logo"><a href="{% url 'home' %}">OneTech</a></div>
-						</div>
-						<div class="footer_title">Got Question? Call Us 24/7</div>
-						<div class="footer_phone">+38 068 005 3570</div>
-						<div class="footer_contact_text">
-							<p>17 Princess Road, London</p>
-							<p>Grester London NW18JR, UK</p>
-						</div>
-						<div class="footer_social">
-							<ul>
-								<li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-								<li><a href="#"><i class="fab fa-twitter"></i></a></li>
-								<li><a href="#"><i class="fab fa-youtube"></i></a></li>
-								<li><a href="#"><i class="fab fa-google"></i></a></li>
-								<li><a href="#"><i class="fab fa-vimeo-v"></i></a></li>
-							</ul>
-						</div>
-					</div>
-				</div>
-
-				<div class="col-lg-2 offset-lg-2">
-					<div class="footer_column">
-						<div class="footer_title">Find it Fast</div>
-						<ul class="footer_list">
-							<li><a href="#">Computers & Laptops</a></li>
-							<li><a href="#">Cameras & Photos</a></li>
-							<li><a href="#">Hardware</a></li>
-							<li><a href="#">Smartphones & Tablets</a></li>
-							<li><a href="#">TV & Audio</a></li>
-						</ul>
-						<div class="footer_subtitle">Gadgets</div>
-						<ul class="footer_list">
-							<li><a href="#">Car Electronics</a></li>
-						</ul>
-					</div>
-				</div>
-
-				<div class="col-lg-2">
-					<div class="footer_column">
-						<ul class="footer_list footer_list_2">
-							<li><a href="#">Video Games & Consoles</a></li>
-							<li><a href="#">Accessories</a></li>
-							<li><a href="#">Cameras & Photos</a></li>
-							<li><a href="#">Hardware</a></li>
-							<li><a href="#">Computers & Laptops</a></li>
-						</ul>
-					</div>
-				</div>
-
-				<div class="col-lg-2">
-					<div class="footer_column">
-						<div class="footer_title">Customer Care</div>
-						<ul class="footer_list">
-							<li><a href="/user">My Account</a></li>
-							<li><a href="#">Order Tracking</a></li>
-							<li><a href="/user/favorites">Wish List</a></li>
-							<li><a href="#">Customer Services</a></li>
-							<li><a href="#">Returns / Exchange</a></li>
-							<li><a href="#">FAQs</a></li>
-							<li><a href="#">Product Support</a></li>
-						</ul>
-					</div>
-				</div>
-
-			</div>
-		</div>
-	</footer>
-
-	<!-- Copyright -->
-
-	<div class="copyright">
-		<div class="container">
-			<div class="row">
-				<div class="col">
-					
-					<div class="copyright_container d-flex flex-sm-row flex-column align-items-center justify-content-start">
-						<div class="copyright_content"><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-</div>
-						<div class="logos ml-sm-auto">
-							<ul class="logos_list">
-								<li><a href="#"><img src="{% static '' %}images/logos_1.png" alt=""></a></li>
-								<li><a href="#"><img src="{% static '' %}images/logos_2.png" alt=""></a></li>
-								<li><a href="#"><img src="{% static '' %}images/logos_3.png" alt=""></a></li>
-								<li><a href="#"><img src="{% static '' %}images/logos_4.png" alt=""></a></li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div> {% endcomment %}
-
-<script src="{% static '' %}js/jquery-3.3.1.min.js"></script>
-<script src="{% static '' %}styles/bootstrap4/popper.js"></script>
-<script src="{% static '' %}styles/bootstrap4/bootstrap.min.js"></script>
-<script src="{% static '' %}plugins/greensock/TweenMax.min.js"></script>
-<script src="{% static '' %}plugins/greensock/TimelineMax.min.js"></script>
-<script src="{% static '' %}plugins/scrollmagic/ScrollMagic.min.js"></script>
-<script src="{% static '' %}plugins/greensock/animation.gsap.min.js"></script>
-<script src="{% static '' %}plugins/greensock/ScrollToPlugin.min.js"></script>
-<script src="{% static '' %}plugins/easing/easing.js"></script>
-<script src="{% static '' %}js/cart_custom.js"></script>
 </body>
 
 </html>

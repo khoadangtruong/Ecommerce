@@ -2,7 +2,7 @@ from django.forms import ModelForm
 from django.contrib.auth.models import User
 from product.models import Product
 from django.db import models
-
+from django import forms
 class ShopCart(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
@@ -54,10 +54,25 @@ class Order(models.Model):
     def __str__(self):
         return self.user.first_name
 
+    def get_total(self):
+        total = self.total
+        return total
+
+PAYMENT_CHOICES = (
+    ('S', 'Stripe'),
+    ('P', 'Paypal'),
+)
+
 class OrderForm(ModelForm):
     class Meta:
         model = Order
         fields = ['first_name', 'last_name', 'phone', 'address', 'city', 'country']
+
+class OrderPaymentForm(ModelForm):
+    payment_option = forms.ChoiceField(widget=forms.RadioSelect(), choices=PAYMENT_CHOICES)
+    class Meta:
+        model = Order
+        fields = ['first_name', 'last_name', 'phone', 'address', 'city', 'country', 'payment_option']
 
 class OrderProduct(models.Model):
     STATUS = (

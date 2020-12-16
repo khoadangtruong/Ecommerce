@@ -1,4 +1,4 @@
-<div id="paypal-button-container" style="margin-top: 20px; width: 100%"></div>
+{% comment %} <div id="paypal-button-container" style="margin-top: 20px; width: 100%"></div>
 
 <!-- Include the PayPal JavaScript SDK -->
 <script src="https://www.paypal.com/sdk/js?client-id=Ac0JzE2C2gleebo98WHQI7V4QE3O_Fns0HEjnFPe0-_sNljwKvcadlNO90qK-27KIF6K_SXocXehmRrA&currency=USD"></script>
@@ -66,4 +66,481 @@
         },
     }).render('#paypal-button-container');
 
+</script> {% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    {% load currency %}
+    <title>Checkout</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="OneTech shop project">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="{% static '' %}styles/bootstrap4/bootstrap.min.css">
+    <link href="{% static '' %}plugins/fontawesome-free-5.0.1/css/fontawesome-all.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="{% static '' %}styles/cart_styles.css">
+    <link rel="stylesheet" type="text/css" href="{% static '' %}styles/cart_responsive.css">
+    <link rel="stylesheet" type="text/css" href="{% static '' %}styles/order_form.css">
+    <link type="text/css" rel="stylesheet" href="{% static '' %}styles/payment.css" />
+
+    <link type="text/css" rel="stylesheet" href="{% static '' %}styles/slick.css" />
+    <link type="text/css" rel="stylesheet" href="{% static '' %}styles/slick-theme.css" />
+    <link type="text/css" rel="stylesheet" href="{% static '' %}styles/nouislider.min.css" />
+    <link type="text/css" rel="stylesheet" href="{% static '' %}styles/style.css" />
+
+</head>
+
+<header class="header">
+
+    <!-- Top Bar -->
+
+    <div class="top_bar">
+        <div class="container">
+            <div class="row">
+                <div class="col d-flex flex-row">
+                    <div class="top_bar_contact_item"><div class="top_bar_icon"><img src="{% static '' %}images/phone.png" alt=""></div>+38 068 005 3570</div>
+                    <div class="top_bar_contact_item"><div class="top_bar_icon"><img src="{% static '' %}images/mail.png" alt=""></div><a href="mailto:fastsales@gmail.com">fastsales@gmail.com</a></div>
+                    <div class="top_bar_content ml-auto">
+                        <div class="top_bar_menu">
+                            <ul class="standard_dropdown top_bar_dropdown">
+                                <li>
+                                    <a href="#">English<i class="fas fa-chevron-down"></i></a>
+                                    <ul>
+                                        <li><a href="#">Italian</a></li>
+                                        <li><a href="#">Spanish</a></li>
+                                        <li><a href="#">Japanese</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <form id="currency_switcher" method="POST" action="{% url 'selectcurrency' %}">
+                                        {% csrf_token %}
+                                        <select name="currency" onchange="submit()" style="border-bottom: none; color: black">
+                                            {% for curr in CURRENCIES %}
+                                                <option value="{{ curr.code }}"
+                                                        {% ifequal curr.code request.session.currency %}selected="selected"{% endifequal %}>
+                                                    {{ curr.symbol }} {{ curr.name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+
+                                        <noscript>
+                                            <input type="submit" value="Set" />
+                                        </noscript>
+                                    </form>
+                                </li>
+                                <li>
+                                    {% if user.id is not None%}
+                                        <a class="user_icon"><img src="{{ user.userprofile.image.url }}" style="height: 28px; width: 30px; border-radius: 30%;" alt="">Hello, {{ user.first_name }}</a>
+                                            <ul>
+                                                <li><a href="/user">User profile</a></li>
+                                                <li><a href="/logout">Logout</a></li>
+                                            </ul>
+                                    {% else %}
+                                        <div class="top_bar_user">
+                                            <div class="user_icon"><img src="{% static 'images/user.svg ' %}" alt=""></div>
+                                            <div><a href="/register">Register</a></div>
+                                            <div><a href="/login">Sign in</a></div>
+                                        </div>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{message.tags}}" role="alert" style="text-align: center; color: red;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>		
+    </div>
+
+    <!-- Header Main -->
+
+    <div class="header_main">
+        <div class="container">
+            <div class="row">
+
+                <!-- Logo -->
+                <div class="col-lg-2 col-sm-3 col-3 order-1">
+                    <div class="logo_container">
+                        <div class="logo"><a href="{% url 'home' %}">OneTech</a></div>
+                    </div>
+                </div>
+
+                <!-- Search -->
+                <div class="col-lg-6 col-12 order-lg-2 order-3 text-lg-left text-right">
+                    <div class="header_search">
+                        <div class="header_search_content">
+                            <div class="header_search_form_container">
+                                <form action="/search/" method="POST" class="header_search_form clearfix">
+                                    {% csrf_token %}
+                                    <input id="query" name="query" type="search" required="required" class="header_search_input" placeholder="Search for products...">
+                                    <div class="custom_dropdown">
+                                        <div class="custom_dropdown_list">
+                                            <span class="custom_dropdown_placeholder clc">All Categories</span>
+                                            <i class="fas fa-chevron-down"></i>
+                                            {% load mptt_tags %}
+                                            <ul class="custom_list clc">
+                                                <select name="catid"  class="input search-categories">
+                                                    <option class="clc" value="0"></option>
+                                                </select>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="header_search_button trans_300" value="Submit"><img src="{% static '' %}images/search.png" alt=""></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Wishlist -->
+                <div class="col-lg-4 col-9 order-lg-3 order-2 text-lg-left text-right">
+                    <div class="wishlist_cart d-flex flex-row align-items-center justify-content-end">
+                        <div class="wishlist d-flex flex-row align-items-center justify-content-end">
+                            <div class="wishlist_icon"><img src="{% static '' %}images/heart.png" alt=""></div>
+                            <div class="wishlist_content">
+                                <div class="wishlist_text"><a href="#">Wishlist</a></div>
+                                <div class="wishlist_count">115</div>
+                            </div>
+                        </div>
+
+                        <!-- Cart -->
+                        <div class="cart">
+                            <div class="cart_container d-flex flex-row align-items-center justify-content-end">
+                                <div class="cart_icon">
+                                    <img src="{% static '' %}images/cart.png" alt="">
+                                    {% load myapptags %}
+                                    {% shopcartcount user.id as count %}
+                                    <div class="cart_count"><span>{{count}}</span></div>
+                                </div>
+                                <div class="cart_content">
+                                    <div class="cart_text"><a href="/shopcart/">Cart</a></div>
+                                    {% load myapptags %}
+                                    {% shopcarttotal user.id as total %}
+                                    <div class="cart_price">{{ total|currency:request.session.currency }} {{ request.session.currency }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Navigation -->
+
+    <nav class="main_nav">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    
+                    <div class="main_nav_content d-flex flex-row">
+
+                        <!-- Categories Menu -->
+
+                        <div class="cat_menu_container">
+                            <div class="cat_menu_title d-flex flex-row align-items-center justify-content-start">
+                                <div class="cat_burger"><span></span><span></span><span></span></div>
+                                <div class="cat_menu_text">categories</div>
+                            </div>
+                            {% load myapptags %}
+                            {% categorylist as category %}
+                            {% load mptt_tags %}
+                            <ul class="cat_menu">
+                                {% recursetree category %}
+                                <li><a href="/category/{{node.id}}/{{node.slug}}">{{node.title}} <i class="fas fa-chevron-right ml-auto"></i></a></li>
+                                {% comment %} <li><a href="#">Cameras & Photos<i class="fas fa-chevron-right"></i></a></li>
+                                <li class="hassubs">
+                                    <a href="#">Hardware<i class="fas fa-chevron-right"></i></a>
+                                    <ul>
+                                        <li class="hassubs">
+                                            <a href="#">Menu Item<i class="fas fa-chevron-right"></i></a>
+                                            <ul>
+                                                <li><a href="#">Menu Item<i class="fas fa-chevron-right"></i></a></li>
+                                                <li><a href="#">Menu Item<i class="fas fa-chevron-right"></i></a></li>
+                                                <li><a href="#">Menu Item<i class="fas fa-chevron-right"></i></a></li>
+                                                <li><a href="#">Menu Item<i class="fas fa-chevron-right"></i></a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="#">Menu Item<i class="fas fa-chevron-right"></i></a></li>
+                                        <li><a href="#">Menu Item<i class="fas fa-chevron-right"></i></a></li>
+                                        <li><a href="#">Menu Item<i class="fas fa-chevron-right"></i></a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#">Smartphones & Tablets<i class="fas fa-chevron-right"></i></a></li>
+                                <li><a href="#">TV & Audio<i class="fas fa-chevron-right"></i></a></li>
+                                <li><a href="#">Gadgets<i class="fas fa-chevron-right"></i></a></li>
+                                <li><a href="#">Car Electronics<i class="fas fa-chevron-right"></i></a></li>
+                                <li><a href="#">Video Games & Consoles<i class="fas fa-chevron-right"></i></a></li>
+                                <li><a href="#">Accessories<i class="fas fa-chevron-right"></i></a></li> {% endcomment %}
+                                {% endrecursetree %}
+                            </ul>
+                        </div>
+
+                        <!-- Main Nav Menu -->
+
+                        <div class="main_nav_menu ml-auto">
+                            <ul class="standard_dropdown main_nav_dropdown">
+                                <li><a href="{% url 'home' %}">Home<i class="fas fa-chevron-down"></i></a></li>
+                                {% comment %} <li class="hassubs">
+                                    <a href="#">Super Deals<i class="fas fa-chevron-down"></i></a>
+                                    <ul>
+                                        <li>
+                                            <a href="#">Menu Item<i class="fas fa-chevron-down"></i></a>
+                                            <ul>
+                                                <li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
+                                                <li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
+                                                <li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
+                                        <li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
+                                        <li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
+                                    </ul>
+                                </li> {% endcomment %}
+                                {% comment %} <li class="hassubs">
+                                    <a href="#">Featured Brands<i class="fas fa-chevron-down"></i></a>
+                                    <ul>
+                                        <li>
+                                            <a href="#">Menu Item<i class="fas fa-chevron-down"></i></a>
+                                            <ul>
+                                                <li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
+                                                <li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
+                                                <li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
+                                        <li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
+                                        <li><a href="#">Menu Item<i class="fas fa-chevron-down"></i></a></li>
+                                    </ul>
+                                </li> {% endcomment %}
+                                <li><a href="{% url 'shop'%}">Shop<i class="fas fa-chevron-down"></i></a></li>
+                                <li><a href="{% url 'blog'%}">Blog<i class="fas fa-chevron-down"></i></a></li> 
+                                <li><a href="{% url 'faq'%}">Faqs<i class="fas fa-chevron-down"></i></a></li>
+                                <li><a href="{% url 'about'%}">About US<i class="fas fa-chevron-down"></i></a></li>
+                                <li><a href="{% url 'contact'%}">Contact<i class="fas fa-chevron-down"></i></a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Menu Trigger -->
+
+                        <div class="menu_trigger_container ml-auto">
+                            <div class="menu_trigger d-flex flex-row align-items-center justify-content-end">
+                                <div class="menu_burger">
+                                    <div class="menu_trigger_text">menu</div>
+                                    <div class="cat_burger menu_burger_inner"><span></span><span></span><span></span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Menu -->
+
+    <div class="page_menu">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    
+                    <div class="page_menu_content">
+                        
+                        <div class="page_menu_search">
+                            <form action="#">
+                                <input type="search" required="required" class="page_menu_search_input" placeholder="Search for products...">
+                            </form>
+                        </div>
+                        <ul class="page_menu_nav">
+                            <li class="page_menu_item has-children">
+                                <a href="#">Language<i class="fa fa-angle-down"></i></a>
+                                <ul class="page_menu_selection">
+                                    <li><a href="#">English<i class="fa fa-angle-down"></i></a></li>
+                                    <li><a href="#">Italian<i class="fa fa-angle-down"></i></a></li>
+                                    <li><a href="#">Spanish<i class="fa fa-angle-down"></i></a></li>
+                                    <li><a href="#">Japanese<i class="fa fa-angle-down"></i></a></li>
+                                </ul>
+                            </li>
+                            <li class="page_menu_item has-children">
+                                <a href="#">Currency<i class="fa fa-angle-down"></i></a>
+                                <ul class="page_menu_selection">
+                                    <li><a href="#">US Dollar<i class="fa fa-angle-down"></i></a></li>
+                                    <li><a href="#">EUR Euro<i class="fa fa-angle-down"></i></a></li>
+                                    <li><a href="#">GBP British Pound<i class="fa fa-angle-down"></i></a></li>
+                                    <li><a href="#">JPY Japanese Yen<i class="fa fa-angle-down"></i></a></li>
+                                </ul>
+                            </li>
+                            <li class="page_menu_item">
+                                <a href="index.html">Home<i class="fa fa-angle-down"></i></a>
+                            </li>
+                            <li class="page_menu_item has-children">
+                                <a href="#">Super Deals<i class="fa fa-angle-down"></i></a>
+                                <ul class="page_menu_selection">
+                                    <li><a href="#">Super Deals<i class="fa fa-angle-down"></i></a></li>
+                                    <li class="page_menu_item has-children">
+                                        <a href="#">Menu Item<i class="fa fa-angle-down"></i></a>
+                                        <ul class="page_menu_selection">
+                                            <li><a href="#">Menu Item<i class="fa fa-angle-down"></i></a></li>
+                                            <li><a href="#">Menu Item<i class="fa fa-angle-down"></i></a></li>
+                                            <li><a href="#">Menu Item<i class="fa fa-angle-down"></i></a></li>
+                                            <li><a href="#">Menu Item<i class="fa fa-angle-down"></i></a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="#">Menu Item<i class="fa fa-angle-down"></i></a></li>
+                                    <li><a href="#">Menu Item<i class="fa fa-angle-down"></i></a></li>
+                                    <li><a href="#">Menu Item<i class="fa fa-angle-down"></i></a></li>
+                                </ul>
+                            </li>
+                            <li class="page_menu_item has-children">
+                                <a href="#">Featured Brands<i class="fa fa-angle-down"></i></a>
+                                <ul class="page_menu_selection">
+                                    <li><a href="#">Featured Brands<i class="fa fa-angle-down"></i></a></li>
+                                    <li><a href="#">Menu Item<i class="fa fa-angle-down"></i></a></li>
+                                    <li><a href="#">Menu Item<i class="fa fa-angle-down"></i></a></li>
+                                    <li><a href="#">Menu Item<i class="fa fa-angle-down"></i></a></li>
+                                </ul>
+                            </li>
+                            <li class="page_menu_item has-children">
+                                <a href="#">Trending Styles<i class="fa fa-angle-down"></i></a>
+                                <ul class="page_menu_selection">
+                                    <li><a href="#">Trending Styles<i class="fa fa-angle-down"></i></a></li>
+                                    <li><a href="#">Menu Item<i class="fa fa-angle-down"></i></a></li>
+                                    <li><a href="#">Menu Item<i class="fa fa-angle-down"></i></a></li>
+                                    <li><a href="#">Menu Item<i class="fa fa-angle-down"></i></a></li>
+                                </ul>
+                            </li>
+                            <li class="page_menu_item"><a href="blog.html">blog<i class="fa fa-angle-down"></i></a></li>
+                            <li class="page_menu_item"><a href="contact.html">contact<i class="fa fa-angle-down"></i></a></li>
+                        </ul>
+                        
+                        <div class="menu_contact">
+                            <div class="menu_contact_item"><div class="menu_contact_icon"><img src="{% static '' %}images/phone_white.png" alt=""></div>+38 068 005 3570</div>
+                            <div class="menu_contact_item"><div class="menu_contact_icon"><img src="{% static '' %}images/mail_white.png" alt=""></div><a href="mailto:fastsales@gmail.com">fastsales@gmail.com</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<script src="https://js.stripe.com/v3/"></script>
+
+
+<div class="checkout-info" >
+    <div class="row">
+        <div class="col-lg-6" style="margin-top: 60px;">
+            <div class="box-element" id="form-wrapper">
+                <form method="post" id="payment-form" class="payment-form">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <label for="card-element">
+                            Credit or debit card
+                        </label>
+                        <div id="card-element" class="card-element"> </div>
+                        <div id="card-errors" role="alert"></div>
+                    </div>
+                    <button class="btn btn-info submit-btn">Submit Payment</button>
+                </form>
+            </div>
+            <br>
+        </div>
+
+        <div class="col-lg-6" style="margin-top: 60px;">
+            <div class="box-element">
+                <h3>Your cart</h3>
+                {% for rs in shopcart %}
+                    <div class="cart-row">
+                        <div style="flex:1.5"><img style="width: 80px;" class="row-image" src="{{ rs.product.image.url }}"></div>
+                        <div style="flex:1.5"><p>{{ rs.product }}</p></div>
+                        <div style="flex:1"><p>{{rs.product.price|currency:request.session.currency}} {{ request.session.currency }}</p></div>
+                        <div style="flex:1"><p>x{{ rs.quantity }}</p></div>
+                    </div>
+                {% endfor %}
+                <h5>Items:   {{ count }}</h5>
+                <h5>Total:   {{ total|currency:request.session.currency }} {{ request.session.currency }}</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Create a Stripe client.
+    var stripe = Stripe('pk_test_51HyuDiAODGeOESBE5eKUT7llk0PI1k2Vx8Fh9YT07GBJW1bHK1Hzg5hajyD9T8EaFMNtQfmPaigz31yC0Iv98sJs00ofCBOekd');
+
+    // Create an instance of Elements.
+    var elements = stripe.elements();
+
+    // Custom styling can be passed to options when creating an Element.
+    // (Note that this demo uses a wider set of styles than the guide below.)
+    var style = {
+    base: {
+        color: '#32325d',
+        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+        fontSmoothing: 'antialiased',
+        fontSize: '16px',
+        '::placeholder': {
+        color: '#aab7c4'
+        }
+    },
+    invalid: {
+        color: '#fa755a',
+        iconColor: '#fa755a'
+    }
+    };
+
+    // Create an instance of the card Element.
+    var card = elements.create('card', {style: style});
+
+    // Add an instance of the card Element into the `card-element` <div>.
+    card.mount('#card-element');
+    // Handle real-time validation errors from the card Element.
+    card.on('change', function(event) {
+    var displayError = document.getElementById('card-errors');
+    if (event.error) {
+        displayError.textContent = event.error.message;
+    } else {
+        displayError.textContent = '';
+    }
+    });
+
+    // Handle form submission.
+    var form = document.getElementById('payment-form');
+    form.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    stripe.createToken(card).then(function(result) {
+        if (result.error) {
+            console.log(result.error)
+            var errorElement = document.getElementById('card-errors');
+            errorElement.textContent = result.error.message;
+        }
+        else {
+            stripeTokenHandler(result.token);
+        }
+    });
+    });
+
+    // Submit the form with the token ID.
+    function stripeTokenHandler(token) {
+    // Insert the token ID into the form so it gets submitted to the server
+    var form = document.getElementById('payment-form');
+    var hiddenInput = document.createElement('input');
+    hiddenInput.setAttribute('type', 'hidden');
+    hiddenInput.setAttribute('name', 'stripeToken');
+    hiddenInput.setAttribute('value', token.id);
+    form.appendChild(hiddenInput);
+
+    // Submit the form
+    form.submit();
+    }
 </script>

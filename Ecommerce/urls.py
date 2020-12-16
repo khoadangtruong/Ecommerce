@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from home import views
 from order import views as OrderViews
+from order.views import PaymentView, Checkoutpayment
 from user import views as UserViews
 from newsletter import views as NewsletterViews
 
@@ -54,6 +55,9 @@ urlpatterns = [
 
     path('shopcart/',OrderViews.shopcart, name='shopcart'),
     path('order_form/',OrderViews.orderproduct, name='orderproduct'),
+
+    path('checkout/', Checkoutpayment.as_view(), name='checkout'),
+    path('payment/<payment_option>/', PaymentView.as_view(), name='payment'),
     path('payment-complete', OrderViews.payment_complete, name="payment_complete"),
 
     path('accounts/', include('allauth.urls')),
