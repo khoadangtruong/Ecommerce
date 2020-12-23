@@ -3,6 +3,11 @@ from django.contrib.auth.models import User
 from product.models import Product
 from django.db import models
 from django import forms
+
+PAYMENT_CHOICES = (
+    ('S', 'Stripe'),
+    ('P', 'Paypal'),
+)
 class ShopCart(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
@@ -18,7 +23,8 @@ class ShopCart(models.Model):
     @property
     def amount(self):
         return (self.quantity * self.product.price)
-            
+    
+    
 
 class ShopCartForm(ModelForm):
     class Meta:
@@ -54,15 +60,6 @@ class Order(models.Model):
     def __str__(self):
         return self.user.first_name
 
-    def get_total(self):
-        total = self.total
-        return total
-
-PAYMENT_CHOICES = (
-    ('S', 'Stripe'),
-    ('P', 'Paypal'),
-)
-
 class OrderForm(ModelForm):
     class Meta:
         model = Order
@@ -96,7 +93,7 @@ class OrderProduct(models.Model):
 class Payment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     charge_id = models.CharField(max_length=100)
-    amount = models.CharField(max_length=100)
+    amount = models.FloatField()
 
     def __str__(self):
         return self.user.username

@@ -184,8 +184,6 @@ def product_page(request, id, slug):
     related_products = list(product.category.products.filter(parent=None).exclude(id=product.id))
     if len(related_products) >= 7:
         related_products = random.sample(related_products, 7)
-    
-    product.count_sold = product.count_sold + 1
 
     product.num_visits = product.num_visits + 1
     

@@ -57,6 +57,7 @@ class Product(models.Model):
     description = models.CharField(max_length=1000)
     image = models.ImageField(blank=True, upload_to='images/')
     price = models.FloatField()
+    discount_price = models.IntegerField(null=True, blank=True)
     amount = models.IntegerField()
     minamount = models.IntegerField(default=3)
     detail = RichTextUploadingField()

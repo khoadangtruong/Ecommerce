@@ -391,7 +391,10 @@
 									<div class="blog_image" style="background-image:url({{ blog.image.url }})"></div>
 								{% endif %}
 								<div class="blog_text">{{ blog.title }}</div>
-								<div class="blog_button"><a href="blog_single.html">Continue Reading</a></div>
+								<div class="blog_button">
+									{% comment %} <a href="/blog_detail/{{ blog.id }}">Continue Reading</a> {% endcomment %}
+									<a href="#">Continue Reading</a>
+								</div>
 							</div>
 						{% endfor %}
 						

@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from home import views
+from blog import views as BlogViews
 from order import views as OrderViews
 from order.views import PaymentView, Checkoutpayment
 from user import views as UserViews
@@ -42,6 +43,7 @@ urlpatterns = [
     path('selectcurrency', views.selectcurrency, name='selectcurrency'),
     path('savelangcur', views.savelangcur, name='savelangcur'),
 
+    # path('blog_detail/<int:id>/', BlogViews.blog_detail, name='blog_detail'),
     path('about/',views.about, name='about'),
     path('faq/',views.faq, name='faq'),
     path('contact/',views.contact, name='contact'),

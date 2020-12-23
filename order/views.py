@@ -13,6 +13,7 @@ from django.contrib.auth.models import User
 from django.views.generic import View
 import stripe
 stripe.api_key = "sk_test_51HyuDiAODGeOESBEJRMK2nSBNQAFoL1jeXdCyFMZNY8irbolH4rhVg6gKRUYbIo8WmdQwb9ILdms3UEuWacS6WBL00AKIj92rW"
+from django.core.exceptions import MultipleObjectsReturned
 
 # Create your views here.
 def index(request):
@@ -136,8 +137,8 @@ def orderproduct(request):
 
                 product = Product.objects.get(id=rs.product_id)
                 product.amount -= rs.quantity
+                product.count_sold += 1
                 product.save()
-            
 
             ShopCart.objects.filter(user_id=current_user.id).delete()
             request.session['cart_item'] = 0 
@@ -161,9 +162,9 @@ def orderproduct(request):
 
 class Checkoutpayment(View):
     
-    def get(self, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
+        current_user = request.user
         order = Order.objects.filter(user=self.request.user)
-        current_user = self.request.user
         shopcart = ShopCart.objects.filter(user_id = current_user.id)
         total = 0
         count = 0
@@ -177,48 +178,46 @@ class Checkoutpayment(View):
         }
         return render(self.request, 'checkoutpayment.html', context)
     
-    def post(self, *args, **kwargs):
-        order = Order.objects.filter(user=self.request.user)
+    def post(self, request, *args, **kwargs):
+        current_user = request.user
         shopcart = ShopCart.objects.filter(user_id = self.request.user.id)
         total = 0
         count = 0
         for rs in shopcart:
             total += rs.product.price * rs.quantity
             count += rs.quantity 
-        form = OrderPaymentForm(self.request.POST or None)
+        form = OrderPaymentForm(request.POST)
         if form.is_valid():
             data = Order()
-            data.first_name = form.cleaned_data.get('first_name')
-            data.last_name = form.cleaned_data.get('last_name')
-            data.address = form.cleaned_data.get('address')
-            data.city = form.cleaned_data.get('city')
-            data.phone = form.cleaned_data.get('phone')
-            data.user_id = self.request.user.id
+            data.first_name = form.cleaned_data['first_name']
+            data.last_name = form.cleaned_data['last_name']
+            data.address = form.cleaned_data['address']
+            data.city = form.cleaned_data['city']
+            data.phone = form.cleaned_data['phone']
+            data.user_id = current_user.id
             data.total = total
-            payment_option = form.cleaned_data.get('payment_option')
+            data.payment_option = form.cleaned_data['payment_option']
             data.save()
 
             for rs in shopcart:
                 detail = OrderProduct()
                 detail.order_id = data.id
                 detail.product_id = rs.product_id
-                detail.user_id = self.request.user.id
+                detail.user_id = current_user.id
                 detail.quantity = rs.quantity
                 detail.price = rs.product.price
                 detail.amount = rs.amount
                 detail.save()
 
                 product = Product.objects.get(id=rs.product_id)
+                product.count_sold += 1
                 product.amount -= rs.quantity
                 product.save()
 
-            ShopCart.objects.filter(user_id=self.request.user.id).delete()
-            self.request.session['cart_item'] = 0 
-
-            if payment_option == "S":
+            if data.payment_option == "S":
                 return redirect('payment', payment_option="stripe")
 
-            if payment_option == "P":
+            if data.payment_option == "P":
                 return redirect('payment', payment_option="paypal")
                 
             messages.info(self.request, "Invalid payment option")
@@ -229,20 +228,43 @@ class Checkoutpayment(View):
 class PaymentView(View):
     
     def get(self, *args, **kwargs):
-        return render(self.request, 'payment.html')
+        order = Order.objects.filter(user=self.request.user)
+        current_user = self.request.user
+        shopcart = ShopCart.objects.filter(user_id = current_user.id)
+        total = 0
+        count = 0
+        for rs in shopcart:
+            total += rs.product.price * rs.quantity
+            count += rs.quantity 
+        context = {
+            'shopcart': shopcart,
+            'order': order,
+            'total': total,
+            'count': count,
+        }
+        return render(self.request, 'payment.html', context)
     
     def post(self, request, *args, **kwargs):
+        current_user = self.request.user
+        shopcart = ShopCart.objects.filter(user_id = current_user.id)
+        orderproduct = OrderProduct.objects.filter(user=self.request.user)
         order = Order.objects.filter(user=self.request.user)
-        shopcart = ShopCart.objects.filter(user_id = self.request.user.id)
+        total = 0
+        count = 0
+        amount = 0
+        for rs in shopcart:
+            total += rs.product.price * rs.quantity
+            count += rs.quantity 
+            amount += rs.amount
         try:
             customer = stripe.Customer.create(
                 email = self.request.user.email,
                 description=self.request.user.username,
                 source = self.request.POST['stripeToken']
             )
-            amount = order.get_total()
+            total = amount
             charge = stripe.Charge.create(
-                amount= amount * 100,
+                amount= total * 100,
                 currency="usd",
                 customer = customer,
                 description="Test payment",
@@ -250,14 +272,14 @@ class PaymentView(View):
             payment = Payment(
                 user=self.request.user,
                 charge_id=charge['id'],
-                amount=amount
+                amount=total
             )
-
             payment.save()
             order.payment = payment
             order.save()
             messages.success(self.request, "Completed payment!")
             return redirect('home')
+
         except stripe.error.CardError as e:
             messages.info(self.request, f"{e.error.message}")
             return redirect('home')
@@ -271,12 +293,11 @@ class PaymentView(View):
             messages.success(self.request, "Check your connection")
             return redirect('home')
         except stripe.error.StripeError as e:
-            messages.success(
-                self.request, "There was an error please try again")
+            messages.success( self.request, "There was an error please try again")
             return redirect('home')
         except Exception as e:
-            messages.success(
-                self.request, "Thank you for your payment")
+            ShopCart.objects.filter(user_id=self.request.user.id).delete()
+            self.request.session['cart_item'] = 0 
+            messages.success(self.request, "Thanks for your shopping")
             return redirect('home')
-        
         

@@ -389,13 +389,13 @@
 							<p>Shipping Information:</p>
 							<hr>
 							<div class="form-field">
-								<input class="form-control" type="text" value="{{ profile.address }}" name="address" placeholder="Address..">
+								<input class="form-control" type="text" value="{{ user.profile.address }}" name="address" placeholder="Address..">
 							</div>
 							<div class="form-field">
-								<input class="form-control" type="text" value="{{ profile.city }}" name="city" placeholder="City..">
+								<input class="form-control" type="text" value="{{ user.profile.city }}" name="city" placeholder="City..">
 							</div>
 							<div class="form-field">
-								<input class="form-control" type="tel" value="{{ profile.phone }}" name="phone" placeholder="Phone..">
+								<input class="form-control" type="tel" value="{{ user.profile.phone }}" name="phone" placeholder="Phone..">
 							</div>
 						</div>
 						<hr>
@@ -411,16 +411,12 @@
 						<button id="form-button" class="btn btn-success btn-block" style="width: 99%" type="submit">Countinue </button>
 					</form>
 				</div>
-
-				
 				
 				<br>
 			</div>
 
 			<div class="col-lg-6" style="margin-top: 60px;">
 				<div class="box-element">
-					{% comment %} <a class="btn btn-outline-dark" href="/shopcart/">Back to cart</a> {% endcomment %}
-					{% comment %} <hr> {% endcomment %}
 					<h3>Order Summary</h3>
 					<hr>
 						{% for rs in shopcart %}
