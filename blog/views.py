@@ -14,9 +14,9 @@ def blog(request):
     }
     return render(request, 'blog.html', context)
 
-# def blog_detail(request, id):
-#     blog = Blog.objects.get(pk = id)
-#     context = {
-#         'blog': blog,
-#     }
-#     return render(request, 'blog_detail.html', context)
+def blog_detail(request, id):
+    blog = Blog.objects.get(pk = id)
+    context = {
+        'blog': blog,
+    }
+    return render(request, 'blog_detail.html', context)
